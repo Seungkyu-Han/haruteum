@@ -1,1 +1,2 @@
 export const MEMORY_COMMAND_SERVICE = Symbol('MEMORY_COMMAND_SERVICE');
+export const IMAGE_MOOD_AGENT = Symbol('IMAGE_MOOD_AGENT');

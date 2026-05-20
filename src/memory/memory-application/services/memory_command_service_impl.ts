@@ -1,10 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import type { ImageMoodAgent } from '../../memory-core/output/agents/image_mood_agent';
+import { Inject, Injectable } from '@nestjs/common';
 import { MemoryCommandService } from '../../memory-core/input/services/memory_command_service';
+import { IMAGE_MOOD_AGENT } from '../../memory-core/memory.token';
 
 @Injectable()
 export class MemoryCommandServiceImpl implements MemoryCommandService {
-  createMemory(imageFile: Buffer, review: string): void {
-    console.log('Creating memory with review:', review);
-    console.log('Image file size:', imageFile.length, 'bytes');
+  constructor(
+    @Inject(IMAGE_MOOD_AGENT) private readonly imageMoodAgent: ImageMoodAgent,
+  ) {}
+
+  async createMemory(imageFile: Buffer): Promise<string> {
+    const mood = await this.imageMoodAgent.invoke(imageFile);
+    return mood;
   }
 }

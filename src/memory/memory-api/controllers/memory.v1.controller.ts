@@ -47,6 +47,6 @@ export class MemoryController {
   })
   @UseInterceptors(FileInterceptor('file'))
   createMemory(@UploadedFile() file: Express.Multer.File) {
-    return this.memoryCommandService.createMemory(file.buffer, '');
+    return this.memoryCommandService.createMemory(file.buffer);
   }
 }
