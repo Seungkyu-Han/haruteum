@@ -1,3 +1,5 @@
+import { ImageVO } from '../../vo/image.vo';
+
 export interface ImageMoodAgent {
-  invoke(imageFiles: Buffer[], comment: string): Promise<string>;
+  invoke(images: ImageVO[], comment: string): Promise<string>;
 }

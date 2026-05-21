@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { MemoryCommandServiceImpl } from './services/memory_command_service_impl';
+import { MemoryCommandServiceImpl } from './services/memory-command.service.impl';
 import { MEMORY_COMMAND_SERVICE } from '../memory-core/memory.token';
 import { MemoryInfraModule } from '../memory-infra/memory-infra.module';
 

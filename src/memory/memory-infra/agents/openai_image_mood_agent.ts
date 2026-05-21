@@ -2,6 +2,7 @@ import { Agent, AgentInputItem, run } from '@openai/agents';
 import { ImageMoodAgent } from '../../memory-core/output/agents/image-mood.agent';
 import { ImageMoodResultSchema } from '../schemas/image_mood_agent_schema';
 import { Injectable } from '@nestjs/common';
+import { ImageVO } from '../../memory-core/vo/image.vo';
 
 @Injectable()
 export class OpenAIImageMoodAgent implements ImageMoodAgent {
@@ -22,9 +23,9 @@ export class OpenAIImageMoodAgent implements ImageMoodAgent {
       outputType: ImageMoodResultSchema,
     });
   }
-  async invoke(imageFiles: Buffer[], comment: string): Promise<string> {
-    const imageContents = imageFiles.map((imageFile) => {
-      const base64Image = imageFile.toString('base64');
+  async invoke(images: ImageVO[], comment: string): Promise<string> {
+    const imageContents = images.map((image: ImageVO) => {
+      const base64Image = image.buffer.toString('base64');
 
       return {
         type: 'input_image' as const,
