@@ -1,4 +1,4 @@
-import type { ImageMoodAgent } from '../../memory-core/output/agents/image_mood_agent';
+import type { ImageMoodAgent } from '../../memory-core/output/agents/image-mood.agent';
 import { Inject, Injectable } from '@nestjs/common';
 import { MemoryCommandService } from '../../memory-core/input/services/memory_command_service';
 import { IMAGE_MOOD_AGENT } from '../../memory-core/memory.token';

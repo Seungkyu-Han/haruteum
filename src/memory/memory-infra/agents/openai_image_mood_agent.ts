@@ -1,5 +1,5 @@
 import { Agent, AgentInputItem, run } from '@openai/agents';
-import { ImageMoodAgent } from '../../memory-core/output/agents/image_mood_agent';
+import { ImageMoodAgent } from '../../memory-core/output/agents/image-mood.agent';
 import { ImageMoodResultSchema } from '../schemas/image_mood_agent_schema';
 import { Injectable } from '@nestjs/common';
 
