@@ -6,6 +6,7 @@ import {
 import { OpenAIImageMoodAgent } from './agents/openai_image_mood_agent';
 import { MinioMemoryImageStorage } from './storages/minio-memory-image.storage';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { MockImageMoodAgent } from './agents/mock_image_mood_agent';
 
 @Module({
   imports: [
@@ -15,8 +16,20 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
   ],
   providers: [
     {
+      inject: [ConfigService],
       provide: IMAGE_MOOD_AGENT,
-      useClass: OpenAIImageMoodAgent,
+      useFactory: (configService: ConfigService) => {
+        const imageMoodAgentType = configService.get<string>(
+          'IMAGE_MOOD_AGENT_TYPE',
+        );
+
+        switch (imageMoodAgentType) {
+          case 'openai':
+            return new OpenAIImageMoodAgent();
+          default:
+            return new MockImageMoodAgent();
+        }
+      },
     },
     {
       inject: [ConfigService],
