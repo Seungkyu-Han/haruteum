@@ -17,10 +17,13 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import type { MemoryCommandService } from '../../memory-core/input/services/memory_command_service';
+import type { MemoryCommandService } from '../../memory-core/input/services/memory_command.service';
 import { MEMORY_COMMAND_SERVICE } from '../../memory-core/memory.token';
 import { CreateMemoryRequestDto } from '../dto/request/create-memory.request.dto';
 import { CreateMemoryResponseDto } from '../dto/response/create-memory.response.dto';
+import { ImageVO } from '../../memory-core/vo/image.vo';
+import { CreateMemoryCommand } from '../../memory-core/commands/create-memory.command';
+import { Memory } from '../../memory-core/memory';
 
 @ApiTags('memory/create')
 @Controller({ path: 'memory', version: '1' })
@@ -55,10 +58,18 @@ export class MemoryController {
     files: Express.Multer.File[],
     @Body() createMemoryRequestDto: CreateMemoryRequestDto,
   ): Promise<CreateMemoryResponseDto> {
-    const summary = await this.memoryCommandService.createMemory(
-      files.map((file) => file.buffer),
+    const createMemoryCommand = new CreateMemoryCommand(
+      files.map((file) => new ImageVO(file.originalname, file.buffer, '')),
       createMemoryRequestDto.comment,
+      new Date(),
     );
-    return { summary };
+
+    const memory: Memory =
+      await this.memoryCommandService.createMemory(createMemoryCommand);
+
+    return {
+      summary: memory.summary || '',
+      images: memory.images.map((image) => image.url),
+    };
   }
 }

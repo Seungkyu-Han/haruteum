@@ -7,4 +7,9 @@ export class CreateMemoryResponseDto {
     example: '카페에서의 추억',
   })
   summary: string;
+
+  @ApiProperty({
+    description: '사진 주소',
+  })
+  images: string[];
 }
