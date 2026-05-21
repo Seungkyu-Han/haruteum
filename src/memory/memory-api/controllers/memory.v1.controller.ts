@@ -1,34 +1,28 @@
 import {
+  Body,
   Controller,
+  HttpStatus,
   Inject,
+  ParseFilePipe,
   Post,
-  UploadedFile,
+  UploadedFiles,
   UseInterceptors,
 } from '@nestjs/common';
-
 import {
   ApiBody,
   ApiConsumes,
   ApiOperation,
-  ApiProperty,
+  ApiProduces,
+  ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-
-import { FileInterceptor } from '@nestjs/platform-express';
-
+import { FilesInterceptor } from '@nestjs/platform-express';
 import type { MemoryCommandService } from '../../memory-core/input/services/memory_command_service';
-
 import { MEMORY_COMMAND_SERVICE } from '../../memory-core/memory.token';
+import { CreateMemoryRequestDto } from '../dto/request/create-memory.request.dto';
+import { CreateMemoryResponseDto } from '../dto/response/create-memory.response.dto';
 
-class CreateMemoryRequestDto {
-  @ApiProperty({
-    type: 'string',
-    format: 'binary',
-  })
-  file!: any;
-}
-
-@ApiTags('memory')
+@ApiTags('memory/create')
 @Controller({ path: 'memory', version: '1' })
 export class MemoryController {
   constructor(
@@ -36,17 +30,35 @@ export class MemoryController {
     private readonly memoryCommandService: MemoryCommandService,
   ) {}
 
-  @Post()
+  @Post('/create')
   @ApiConsumes('multipart/form-data')
+  @ApiProduces('application/json')
   @ApiBody({
     type: CreateMemoryRequestDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '추억 생성 성공',
+    type: CreateMemoryResponseDto,
   })
   @ApiOperation({
     summary: 'summary',
     description: 'description',
   })
-  @UseInterceptors(FileInterceptor('file'))
-  createMemory(@UploadedFile() file: Express.Multer.File) {
-    return this.memoryCommandService.createMemory(file.buffer);
+  @UseInterceptors(FilesInterceptor('files'))
+  async createMemory(
+    @UploadedFiles(
+      new ParseFilePipe({
+        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
+      }),
+    )
+    files: Express.Multer.File[],
+    @Body() createMemoryRequestDto: CreateMemoryRequestDto,
+  ): Promise<CreateMemoryResponseDto> {
+    const summary = await this.memoryCommandService.createMemory(
+      files.map((file) => file.buffer),
+      createMemoryRequestDto.comment,
+    );
+    return { summary };
   }
 }

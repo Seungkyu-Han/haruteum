@@ -1,3 +1,3 @@
 export interface MemoryCommandService {
-  createMemory(imageFile: Buffer): Promise<string>;
+  createMemory(imageFiles: Buffer[], comment: string): Promise<string>;
 }

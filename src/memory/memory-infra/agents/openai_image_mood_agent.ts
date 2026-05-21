@@ -12,24 +12,34 @@ export class OpenAIImageMoodAgent implements ImageMoodAgent {
       name: 'image mood agent',
       model: 'gpt-4.1-mini-2025-04-14',
       instructions: `
-        사진 속 연인의 분위기와 감정을 분석하세요.
+        사진 속 연인의 일상과 추억을 분위기있게 요약해주세요.
 
-        반드시 한국어로 작성하세요.
-        결과는 최대 2줄 이내로 요약하세요.
+        반드시 한국어로 작성해주고, 일상에서 사용하는 말투로 작성해주세요.
+        EXAMPLE:
+        오늘은 눈 오는 날 같이 카페에 가서 많은 이야기를 나눈 날!
+        레스토랑에서 같이 파스타를 먹었다!
       `,
       outputType: ImageMoodResultSchema,
     });
   }
-  async invoke(imageFile: Buffer) {
-    const base64Image = imageFile.toString('base64');
+  async invoke(imageFiles: Buffer[], comment: string): Promise<string> {
+    const imageContents = imageFiles.map((imageFile) => {
+      const base64Image = imageFile.toString('base64');
+
+      return {
+        type: 'input_image' as const,
+        image: `data:image/jpeg;base64,${base64Image}`,
+      };
+    });
 
     const agentInputItem: AgentInputItem = {
       role: 'user',
       content: [
         {
-          type: 'input_image',
-          image: `data:image/jpeg;base64,${base64Image}`,
+          type: 'input_text',
+          text: `사용자가 입력한 요약: ${comment}`,
         },
+        ...imageContents,
       ],
     };
 

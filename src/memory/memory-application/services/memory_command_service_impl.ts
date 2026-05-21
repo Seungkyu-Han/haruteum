@@ -9,8 +9,8 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
     @Inject(IMAGE_MOOD_AGENT) private readonly imageMoodAgent: ImageMoodAgent,
   ) {}
 
-  async createMemory(imageFile: Buffer): Promise<string> {
-    const mood = await this.imageMoodAgent.invoke(imageFile);
+  async createMemory(imageFiles: Buffer[], comment: string): Promise<string> {
+    const mood = await this.imageMoodAgent.invoke(imageFiles, comment);
     return mood;
   }
 }
