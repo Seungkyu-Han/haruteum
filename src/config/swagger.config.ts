@@ -6,7 +6,7 @@ export function initSwagger(app: INestApplication): void {
     .setTitle('haruteum backend')
     .setDescription('haruteum backend API documentation')
     .setVersion('0.0.1')
-    .addServer('/v1')
+    .addServer('/api/v1')
     .addBearerAuth(
       {
         type: 'http',

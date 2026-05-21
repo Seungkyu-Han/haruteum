@@ -1,11 +1,17 @@
 import { Module } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import {
+  ConfigService,
+  ConfigModule as NestConfigModule,
+} from '@nestjs/config';
 import { ErrorReporterModule } from '@seungkyu/error-reporter';
 
 @Module({
   imports: [
+    NestConfigModule.forRoot({
+      isGlobal: false,
+    }),
     ErrorReporterModule.forRootAsync({
-      imports: [ConfigModule],
+      imports: [NestConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
         type: 'slack',
