@@ -2,7 +2,8 @@ import { Agent, AgentInputItem, run } from '@openai/agents';
 import { ImageMoodAgent } from '../../memory-core/output/agents/image-mood.agent';
 import { ImageMoodResultSchema } from '../schemas/image_mood_agent_schema';
 import { Injectable } from '@nestjs/common';
-import { ImageVO } from '../../memory-core/vo/image.vo';
+import { MemoryImage } from '../../memory-core/memory-image';
+import { MemoryComment } from '../../memory-core/memory-comment';
 
 @Injectable()
 export class OpenAIImageMoodAgent implements ImageMoodAgent {
@@ -23,9 +24,12 @@ export class OpenAIImageMoodAgent implements ImageMoodAgent {
       outputType: ImageMoodResultSchema,
     });
   }
-  async invoke(images: ImageVO[], comment: string): Promise<string> {
-    const imageContents = images.map((image: ImageVO) => {
-      const base64Image = image.buffer.toString('base64');
+  async invoke(
+    memoryImages: MemoryImage[],
+    memoryComments: MemoryComment[],
+  ): Promise<string> {
+    const imageContents = memoryImages.map((memoryImage: MemoryImage) => {
+      const base64Image = memoryImage.buffer.toString('base64');
 
       return {
         type: 'input_image' as const,
@@ -38,7 +42,7 @@ export class OpenAIImageMoodAgent implements ImageMoodAgent {
       content: [
         {
           type: 'input_text',
-          text: `사용자가 입력한 요약: ${comment}`,
+          text: `사용자가 입력한 요약: ${memoryComments.map((c) => c.comment).join(', ')}`,
         },
         ...imageContents,
       ],

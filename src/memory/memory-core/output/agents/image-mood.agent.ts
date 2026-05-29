@@ -1,5 +1,9 @@
-import { ImageVO } from '../../vo/image.vo';
+import { MemoryComment } from '../../memory-comment';
+import { MemoryImage } from '../../memory-image';
 
 export interface ImageMoodAgent {
-  invoke(images: ImageVO[], comment: string): Promise<string>;
+  invoke(
+    memoryImages: MemoryImage[],
+    memoryComments: MemoryComment[],
+  ): Promise<string>;
 }

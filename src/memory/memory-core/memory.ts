@@ -1,29 +1,42 @@
+import { MemoryComment } from './memory-comment';
+import { MemoryImage } from './memory-image';
 import { ImageMoodAgent } from './output/agents/image-mood.agent';
-import { ImageVO } from './vo/image.vo';
 
 export class Memory {
-  private readonly _images: ImageVO[];
-  private readonly _comment: string;
+  private readonly _memoryImages: MemoryImage[];
+  private readonly _comments: MemoryComment[];
   private readonly _createdAt: Date;
   private _summary: string | undefined;
 
-  constructor(images: ImageVO[], comment: string, createdAt?: Date) {
-    this._images = images;
-    this._comment = comment;
+  constructor({
+    memoryImages,
+    comments,
+    createdAt,
+  }: {
+    memoryImages: MemoryImage[];
+    comments: MemoryComment[];
+    createdAt?: Date;
+    summary?: string;
+  }) {
+    this._memoryImages = memoryImages;
+    this._comments = comments;
     this._createdAt = createdAt || new Date();
     this._summary = undefined;
   }
 
   async summarize(imageMoodAgent: ImageMoodAgent): Promise<void> {
-    this._summary = await imageMoodAgent.invoke(this._images, this._comment);
+    this._summary = await imageMoodAgent.invoke(
+      this._memoryImages,
+      this._comments,
+    );
   }
 
-  get images() {
-    return this._images;
+  get memoryImages() {
+    return this._memoryImages;
   }
 
   get comment() {
-    return this._comment;
+    return this._comments;
   }
 
   get createdAt() {

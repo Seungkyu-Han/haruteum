@@ -7,9 +7,18 @@ import { OpenAIImageMoodAgent } from './agents/openai_image_mood_agent';
 import { MinioMemoryImageStorage } from './storages/minio-memory-image.storage';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MockImageMoodAgent } from './agents/mock_image_mood_agent';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { MemoryImageEntity } from './entities/memory-image.entity';
+import { MemoryCommentEntity } from './entities/memory-comment.entity';
+import { MemoryEntity } from './entities/memory.entity';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([
+      MemoryImageEntity,
+      MemoryCommentEntity,
+      MemoryEntity,
+    ]),
     ConfigModule.forRoot({
       isGlobal: false,
     }),
