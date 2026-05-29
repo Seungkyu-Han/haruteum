@@ -1,25 +1,30 @@
+import { randomUUID } from 'crypto';
 import { MemoryComment } from './memory-comment';
 import { MemoryImage } from './memory-image';
 import { ImageMoodAgent } from './output/agents/image-mood.agent';
 
 export class Memory {
+  private readonly _id: string;
   private readonly _memoryImages: MemoryImage[];
-  private readonly _comments: MemoryComment[];
+  private readonly _memoryComments: MemoryComment[];
   private readonly _createdAt: Date;
   private _summary: string | undefined;
 
   constructor({
+    id,
     memoryImages,
-    comments,
+    memoryComments,
     createdAt,
   }: {
+    id?: string;
     memoryImages: MemoryImage[];
-    comments: MemoryComment[];
+    memoryComments: MemoryComment[];
     createdAt?: Date;
     summary?: string;
   }) {
+    this._id = id || randomUUID();
     this._memoryImages = memoryImages;
-    this._comments = comments;
+    this._memoryComments = memoryComments;
     this._createdAt = createdAt || new Date();
     this._summary = undefined;
   }
@@ -27,16 +32,20 @@ export class Memory {
   async summarize(imageMoodAgent: ImageMoodAgent): Promise<void> {
     this._summary = await imageMoodAgent.invoke(
       this._memoryImages,
-      this._comments,
+      this._memoryComments,
     );
+  }
+
+  get id() {
+    return this._id;
   }
 
   get memoryImages() {
     return this._memoryImages;
   }
 
-  get comment() {
-    return this._comments;
+  get memoryComments() {
+    return this._memoryComments;
   }
 
   get createdAt() {

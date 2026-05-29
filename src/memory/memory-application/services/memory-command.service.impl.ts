@@ -9,6 +9,7 @@ import {
 import { CreateMemoryCommand } from '../../memory-core/commands/create-memory.command';
 import { Memory } from '../../memory-core/memory';
 import { MemoryImage } from '../../memory-core/memory-image';
+import { MemoryComment } from '../../memory-core/memory-comment';
 import { randomUUID } from 'crypto';
 
 @Injectable()
@@ -25,20 +26,27 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
     const memoryId: string = randomUUID();
 
     const memoryImages = await Promise.all(
-      createMemoryCommand.images.map(async (image) => {
+      createMemoryCommand.imageCommands.map(async (image) => {
         const uploadedUrl = await this.memoryImageStorage.saveImage(image);
         return new MemoryImage({
           memoryId,
           filename: image.filename,
-          buffer: image.buffer,
           url: uploadedUrl,
         });
       }),
     );
 
+    const memoryComments = createMemoryCommand.commentCommands.map(
+      (commentCommand) =>
+        new MemoryComment({
+          memoryId,
+          comment: commentCommand.comment,
+        }),
+    );
+
     const memory = new Memory({
       memoryImages,
-      comment: createMemoryCommand.comment,
+      memoryComments,
       createdAt: createMemoryCommand.createdAt,
     });
 

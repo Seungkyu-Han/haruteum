@@ -1,4 +1,12 @@
-import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  DeleteDateColumn,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
+} from 'typeorm';
 import { MemoryEntity } from './memory.entity';
 
 @Entity('memory_comments')
@@ -7,7 +15,7 @@ export class MemoryCommentEntity {
   id: string;
 
   @Column({ type: 'text' })
-  content: string;
+  comment: string;
 
   @ManyToOne(
     () => MemoryEntity,
@@ -19,4 +27,10 @@ export class MemoryCommentEntity {
   )
   @JoinColumn({ name: 'memory_id' })
   memoryEntity: MemoryEntity;
+
+  @CreateDateColumn({ type: 'timestamp' })
+  createdAt: Date;
+
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deletedAt?: Date;
 }

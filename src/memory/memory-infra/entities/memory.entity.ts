@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   OneToMany,
+  Column,
 } from 'typeorm';
 import { MemoryCommentEntity } from './memory-comment.entity';
 import { MemoryImageEntity } from './memory-image.entity';
@@ -12,6 +13,9 @@ import { MemoryImageEntity } from './memory-image.entity';
 export class MemoryEntity {
   @PrimaryColumn({ type: 'uuid' })
   id: string;
+
+  @Column({ type: 'text', nullable: true })
+  summary?: string;
 
   @OneToMany(
     () => MemoryCommentEntity,
@@ -35,5 +39,5 @@ export class MemoryEntity {
   createdAt: Date;
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
-  deletedAt: Date;
+  deletedAt?: Date;
 }

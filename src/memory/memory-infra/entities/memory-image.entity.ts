@@ -17,6 +17,9 @@ export class MemoryImageEntity {
   @Column({ type: 'text' })
   url: string;
 
+  @Column({ type: 'text' })
+  filename: string;
+
   @ManyToOne(
     () => MemoryEntity,
     (memoryEntity) => memoryEntity.memoryImageEntities,
@@ -32,5 +35,5 @@ export class MemoryImageEntity {
   createdAt: Date;
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
-  deletedAt: Date;
+  deletedAt?: Date;
 }

@@ -4,35 +4,31 @@ export class MemoryImage {
   private readonly _id: string;
   private readonly _memoryId: string;
   private readonly _filename: string;
-  private readonly _buffer: Buffer;
   private readonly _url: string;
+  private readonly _createdAt: Date;
 
   constructor({
     id,
     memoryId,
     filename,
-    buffer,
     url,
+    createdAt,
   }: {
     id?: string;
     memoryId: string;
     filename: string;
-    buffer: Buffer;
     url: string;
+    createdAt?: Date;
   }) {
     this._id = id ?? randomUUID();
     this._memoryId = memoryId;
     this._filename = filename;
-    this._buffer = buffer;
     this._url = url;
+    this._createdAt = createdAt ?? new Date();
   }
 
   get filename() {
     return this._filename;
-  }
-
-  get buffer() {
-    return this._buffer;
   }
 
   get url() {
@@ -45,5 +41,9 @@ export class MemoryImage {
 
   get id() {
     return this._id;
+  }
+
+  get createdAt() {
+    return this._createdAt;
   }
 }
