@@ -24,7 +24,6 @@ export class MemoryImageEntity {
     () => MemoryEntity,
     (memoryEntity) => memoryEntity.memoryImageEntities,
     {
-      lazy: true,
       onDelete: 'CASCADE',
     },
   )

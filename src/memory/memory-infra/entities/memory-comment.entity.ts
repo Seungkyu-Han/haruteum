@@ -21,7 +21,6 @@ export class MemoryCommentEntity {
     () => MemoryEntity,
     (memoryEntity) => memoryEntity.memoryCommentEntities,
     {
-      lazy: false,
       onDelete: 'CASCADE',
     },
   )

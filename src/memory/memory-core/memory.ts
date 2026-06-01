@@ -29,9 +29,12 @@ export class Memory {
     this._summary = undefined;
   }
 
-  async summarize(imageMoodAgent: ImageMoodAgent): Promise<void> {
+  async summarize(
+    memoryImageBuffers: Buffer[],
+    imageMoodAgent: ImageMoodAgent,
+  ): Promise<void> {
     this._summary = await imageMoodAgent.invoke(
-      this._memoryImages,
+      memoryImageBuffers,
       this._memoryComments,
     );
   }

@@ -5,12 +5,14 @@ import { MemoryCommandService } from '../../memory-core/input/services/memory_co
 import {
   IMAGE_MOOD_AGENT,
   MEMORY_IMAGE_STORAGE,
+  MEMORY_REPOSITORY,
 } from '../../memory-core/memory.token';
 import { CreateMemoryCommand } from '../../memory-core/commands/create-memory.command';
 import { Memory } from '../../memory-core/memory';
 import { MemoryImage } from '../../memory-core/memory-image';
 import { MemoryComment } from '../../memory-core/memory-comment';
 import { randomUUID } from 'crypto';
+import type { IMemoryRepository } from '../../memory-core/output/repositories/memory.repository';
 
 @Injectable()
 export class MemoryCommandServiceImpl implements MemoryCommandService {
@@ -18,6 +20,8 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
     @Inject(IMAGE_MOOD_AGENT) private readonly imageMoodAgent: ImageMoodAgent,
     @Inject(MEMORY_IMAGE_STORAGE)
     private readonly memoryImageStorage: MemoryImageStorage,
+    @Inject(MEMORY_REPOSITORY)
+    private readonly memoryRepository: IMemoryRepository,
   ) {}
 
   async createMemory(
@@ -27,7 +31,10 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
 
     const memoryImages = await Promise.all(
       createMemoryCommand.imageCommands.map(async (image) => {
-        const uploadedUrl = await this.memoryImageStorage.saveImage(image);
+        const uploadedUrl = await this.memoryImageStorage.saveImage(
+          image.filename,
+          image.buffer,
+        );
         return new MemoryImage({
           memoryId,
           filename: image.filename,
@@ -45,12 +52,18 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
     );
 
     const memory = new Memory({
+      id: memoryId,
       memoryImages,
       memoryComments,
       createdAt: createMemoryCommand.createdAt,
     });
 
-    await memory.summarize(this.imageMoodAgent);
+    await memory.summarize(
+      createMemoryCommand.imageCommands.map((image) => image.buffer),
+      this.imageMoodAgent,
+    );
+
+    await this.memoryRepository.save(memory);
 
     return memory;
   }

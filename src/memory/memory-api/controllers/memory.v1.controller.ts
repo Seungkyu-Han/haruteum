@@ -74,7 +74,7 @@ export class MemoryController {
 
     return {
       summary: memory.summary || '',
-      images: [],
+      images: memory.memoryImages.map((image) => image.url),
     };
   }
 }

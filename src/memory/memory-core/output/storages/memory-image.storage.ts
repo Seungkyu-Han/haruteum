@@ -1,5 +1,3 @@
-import { ImageVO } from '../../vo/image.vo';
-
 export interface MemoryImageStorage {
-  saveImage(imageVO: ImageVO): Promise<string>;
+  saveImage(filename: string, buffer: Buffer): Promise<string>;
 }
