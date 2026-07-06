@@ -92,7 +92,7 @@ export class MemoryController {
 
     return {
       summary: memory.summary || '',
-      images: memory.memoryImages.map((image) => `/uploads/${image.url}`),
+      images: memory.memoryImages.map((image) => `${image.url}`),
       comments: memory.memoryComments.map((comment) => comment.comment),
       emotions: memory.emotions,
       happyScore: memory.happyScore,
