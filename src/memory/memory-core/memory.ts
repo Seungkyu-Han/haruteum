@@ -8,17 +8,23 @@ export class Memory {
   private readonly _memoryImages: MemoryImage[];
   private readonly _memoryComments: MemoryComment[];
   private readonly _createdAt: Date;
+  private _happyScore: number;
+  private readonly _emotions: string[];
   private _summary: string | undefined;
 
   constructor({
     id,
     memoryImages,
     memoryComments,
+    happyScore,
+    emotions,
     createdAt,
   }: {
     id?: string;
     memoryImages: MemoryImage[];
     memoryComments: MemoryComment[];
+    happyScore?: number;
+    emotions: string[];
     createdAt?: Date;
     summary?: string;
   }) {
@@ -27,16 +33,21 @@ export class Memory {
     this._memoryComments = memoryComments;
     this._createdAt = createdAt || new Date();
     this._summary = undefined;
+    this._happyScore = happyScore || 0;
+    this._emotions = emotions;
   }
 
   async summarize(
     memoryImageBuffers: Buffer[],
     imageMoodAgent: ImageMoodAgent,
   ): Promise<void> {
-    this._summary = await imageMoodAgent.invoke(
+    const imageMoodAgentModel = await imageMoodAgent.invoke(
       memoryImageBuffers,
       this._memoryComments,
     );
+
+    this._summary = imageMoodAgentModel.summary;
+    this._happyScore = imageMoodAgentModel.happyScore;
   }
 
   get id() {
@@ -57,5 +68,13 @@ export class Memory {
 
   get summary() {
     return this._summary;
+  }
+
+  get happyScore() {
+    return this._happyScore;
+  }
+
+  get emotions() {
+    return this._emotions;
   }
 }

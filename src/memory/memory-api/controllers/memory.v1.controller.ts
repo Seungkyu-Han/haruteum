@@ -66,6 +66,7 @@ export class MemoryController {
         (file) => new CreateMemoryImageCommand(file.originalname, file.buffer),
       ),
       [new createMemoryCommentCommand(createMemoryRequestDto.comment)],
+      createMemoryRequestDto.emotion,
       new Date(),
     );
 
@@ -75,6 +76,10 @@ export class MemoryController {
     return {
       summary: memory.summary || '',
       images: memory.memoryImages.map((image) => image.url),
+      comments: memory.memoryComments.map((comment) => comment.comment),
+      emotions: memory.emotions,
+      happyScore: memory.happyScore,
+      createdAt: memory.createdAt,
     };
   }
 }

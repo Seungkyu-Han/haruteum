@@ -55,6 +55,7 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
       id: memoryId,
       memoryImages,
       memoryComments,
+      emotions: [createMemoryCommand.emotion],
       createdAt: createMemoryCommand.createdAt,
     });
 

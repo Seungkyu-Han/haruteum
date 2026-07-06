@@ -3,6 +3,7 @@ import { ImageMoodAgent } from '../../memory-core/output/agents/image-mood.agent
 import { ImageMoodResultSchema } from '../schemas/image_mood_agent_schema';
 import { Injectable } from '@nestjs/common';
 import { MemoryComment } from '../../memory-core/memory-comment';
+import { ImageMoodAgentModel } from '../../memory-core/models/image-mood-agent.model';
 
 @Injectable()
 export class OpenAIImageMoodAgent implements ImageMoodAgent {
@@ -26,7 +27,7 @@ export class OpenAIImageMoodAgent implements ImageMoodAgent {
   async invoke(
     memoryImageBuffers: Buffer[],
     memoryComments: MemoryComment[],
-  ): Promise<string> {
+  ): Promise<ImageMoodAgentModel> {
     const imageContents = memoryImageBuffers.map((buffer: Buffer) => {
       const base64Image = buffer.toString('base64');
 
@@ -53,6 +54,8 @@ export class OpenAIImageMoodAgent implements ImageMoodAgent {
       throw new Error('Image mood agent returned no output');
     }
 
-    return result.finalOutput.mood;
+    const finalOutput = result.finalOutput;
+
+    return new ImageMoodAgentModel(finalOutput.mood, finalOutput.happyScore);
   }
 }

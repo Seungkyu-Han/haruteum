@@ -17,4 +17,9 @@ export class CreateMemoryRequestDto {
     example: '카페에 갔다.',
   })
   comment: string;
+  @ApiProperty({
+    description: '추억의 감정',
+    example: '행복해',
+  })
+  emotion: string;
 }

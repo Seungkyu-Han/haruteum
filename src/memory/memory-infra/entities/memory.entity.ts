@@ -17,6 +17,12 @@ export class MemoryEntity {
   @Column({ type: 'text', nullable: true })
   summary?: string;
 
+  @Column({ type: 'integer' })
+  happyScore: number;
+
+  @Column({ type: 'text' })
+  emotion: string;
+
   @OneToMany(
     () => MemoryCommentEntity,
     (commentEntity) => commentEntity.memoryEntity,

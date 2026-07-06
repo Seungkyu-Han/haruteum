@@ -13,6 +13,7 @@ export class CreateMemoryCommand {
   constructor(
     public readonly imageCommands: CreateMemoryImageCommand[],
     public readonly commentCommands: createMemoryCommentCommand[],
+    public readonly emotion: string,
     public readonly createdAt?: Date,
   ) {}
 }
