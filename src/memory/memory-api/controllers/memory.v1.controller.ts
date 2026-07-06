@@ -16,7 +16,10 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
+import * as fs from 'node:fs';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import type { MemoryCommandService } from '../../memory-core/input/services/memory_command.service';
 import { MEMORY_COMMAND_SERVICE } from '../../memory-core/memory.token';
 import { CreateMemoryRequestDto } from '../dto/request/create-memory.request.dto';
@@ -51,7 +54,19 @@ export class MemoryController {
     summary: 'summary',
     description: 'description',
   })
-  @UseInterceptors(FilesInterceptor('files'))
+  @UseInterceptors(
+    FilesInterceptor('files', 10, {
+      storage: diskStorage({
+        destination: './uploads',
+        filename: (req, file, cb) => {
+          const uniqueSuffix =
+            Date.now() + '-' + Math.round(Math.random() * 1e9);
+          const ext = extname(file.originalname);
+          cb(null, `${uniqueSuffix}${ext}`);
+        },
+      }),
+    }),
+  )
   async createMemory(
     @UploadedFiles(
       new ParseFilePipe({
@@ -62,9 +77,11 @@ export class MemoryController {
     @Body() createMemoryRequestDto: CreateMemoryRequestDto,
   ): Promise<CreateMemoryResponseDto> {
     const createMemoryCommand = new CreateMemoryCommand(
-      files.map(
-        (file) => new CreateMemoryImageCommand(file.originalname, file.buffer),
-      ),
+      files.map((file) => {
+        const fileBuffer: Buffer = fs.readFileSync(file.path);
+
+        return new CreateMemoryImageCommand(file.filename, fileBuffer);
+      }),
       [new createMemoryCommentCommand(createMemoryRequestDto.comment)],
       createMemoryRequestDto.emotion,
       new Date(),
@@ -75,7 +92,7 @@ export class MemoryController {
 
     return {
       summary: memory.summary || '',
-      images: memory.memoryImages.map((image) => image.url),
+      images: memory.memoryImages.map((image) => `${image.url}`),
       comments: memory.memoryComments.map((comment) => comment.comment),
       emotions: memory.emotions,
       happyScore: memory.happyScore,
