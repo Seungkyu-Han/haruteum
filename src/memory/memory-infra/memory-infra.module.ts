@@ -2,19 +2,34 @@ import { Module } from '@nestjs/common';
 import {
   IMAGE_MOOD_AGENT,
   MEMORY_IMAGE_STORAGE,
+  MEMORY_REPOSITORY,
 } from '../memory-core/memory.token';
 import { OpenAIImageMoodAgent } from './agents/openai_image_mood_agent';
 import { MinioMemoryImageStorage } from './storages/minio-memory-image.storage';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MockImageMoodAgent } from './agents/mock_image_mood_agent';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { MemoryImageEntity } from './entities/memory-image.entity';
+import { MemoryCommentEntity } from './entities/memory-comment.entity';
+import { MemoryEntity } from './entities/memory.entity';
+import { MemoryRepositoryPg } from './repositories/memory.repository.pg';
 
 @Module({
   imports: [
+    TypeOrmModule.forFeature([
+      MemoryImageEntity,
+      MemoryCommentEntity,
+      MemoryEntity,
+    ]),
     ConfigModule.forRoot({
       isGlobal: false,
     }),
   ],
   providers: [
+    {
+      provide: MEMORY_REPOSITORY,
+      useClass: MemoryRepositoryPg,
+    },
     {
       inject: [ConfigService],
       provide: IMAGE_MOOD_AGENT,
@@ -59,6 +74,6 @@ import { MockImageMoodAgent } from './agents/mock_image_mood_agent';
       },
     },
   ],
-  exports: [IMAGE_MOOD_AGENT, MEMORY_IMAGE_STORAGE],
+  exports: [IMAGE_MOOD_AGENT, MEMORY_IMAGE_STORAGE, MEMORY_REPOSITORY],
 })
 export class MemoryInfraModule {}

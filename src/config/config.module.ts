@@ -31,6 +31,7 @@ import { ErrorReporterModule } from '@seungkyu/error-reporter';
         password: configService.getOrThrow('DB_PASSWORD'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
         database: configService.getOrThrow('DB_NAME'),
+        autoLoadEntities: true,
         synchronize: true,
       }),
     }),

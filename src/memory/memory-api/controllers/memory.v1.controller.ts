@@ -21,8 +21,11 @@ import type { MemoryCommandService } from '../../memory-core/input/services/memo
 import { MEMORY_COMMAND_SERVICE } from '../../memory-core/memory.token';
 import { CreateMemoryRequestDto } from '../dto/request/create-memory.request.dto';
 import { CreateMemoryResponseDto } from '../dto/response/create-memory.response.dto';
-import { ImageVO } from '../../memory-core/vo/image.vo';
-import { CreateMemoryCommand } from '../../memory-core/commands/create-memory.command';
+import {
+  CreateMemoryCommand,
+  CreateMemoryImageCommand,
+  createMemoryCommentCommand,
+} from '../../memory-core/commands/create-memory.command';
 import { Memory } from '../../memory-core/memory';
 
 @ApiTags('memory/create')
@@ -59,8 +62,11 @@ export class MemoryController {
     @Body() createMemoryRequestDto: CreateMemoryRequestDto,
   ): Promise<CreateMemoryResponseDto> {
     const createMemoryCommand = new CreateMemoryCommand(
-      files.map((file) => new ImageVO(file.originalname, file.buffer, '')),
-      createMemoryRequestDto.comment,
+      files.map(
+        (file) => new CreateMemoryImageCommand(file.originalname, file.buffer),
+      ),
+      [new createMemoryCommentCommand(createMemoryRequestDto.comment)],
+      createMemoryRequestDto.emotion,
       new Date(),
     );
 
@@ -69,7 +75,11 @@ export class MemoryController {
 
     return {
       summary: memory.summary || '',
-      images: memory.images.map((image) => image.url),
+      images: memory.memoryImages.map((image) => image.url),
+      comments: memory.memoryComments.map((comment) => comment.comment),
+      emotions: memory.emotions,
+      happyScore: memory.happyScore,
+      createdAt: memory.createdAt,
     };
   }
 }

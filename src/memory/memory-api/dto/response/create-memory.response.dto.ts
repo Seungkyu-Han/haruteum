@@ -12,4 +12,28 @@ export class CreateMemoryResponseDto {
     description: '사진 주소',
   })
   images: string[];
+
+  @ApiProperty({
+    description: '추억에 대한 댓글',
+    example: ['즐거웠어!', '다음에 또 가자!'],
+  })
+  comments: string[];
+
+  @ApiProperty({
+    description: '추억에 대한 감정',
+    example: ['행복해', '즐거워'],
+  })
+  emotions: string[];
+
+  @ApiProperty({
+    description: '행복 점수',
+    example: 85,
+  })
+  happyScore: number;
+
+  @ApiProperty({
+    description: '추억이 생성된 날짜',
+    example: '2023-10-01T12:00:00Z',
+  })
+  createdAt: Date;
 }

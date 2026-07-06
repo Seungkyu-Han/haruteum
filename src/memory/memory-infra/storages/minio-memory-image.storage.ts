@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { MemoryImageStorage } from '../../memory-core/output/storages/memory-image.storage';
 import { v4 as uuidv4 } from 'uuid';
-import { ImageVO } from '../../memory-core/vo/image.vo';
 
 @Injectable()
 export class MinioMemoryImageStorage implements MemoryImageStorage {
@@ -28,20 +27,19 @@ export class MinioMemoryImageStorage implements MemoryImageStorage {
     });
   }
 
-  async saveImage(imageVO: ImageVO): Promise<string> {
-    const fileExtension =
-      imageVO.filename.split('.').pop()?.toLowerCase() ?? '';
+  async saveImage(filename: string, buffer: Buffer): Promise<string> {
+    const fileExtension = filename.split('.').pop()?.toLowerCase() ?? '';
     const fileName = `${uuidv4()}${fileExtension ? `.${fileExtension}` : ''}`;
 
     await this.s3Client.send(
       new PutObjectCommand({
         Bucket: this.bucketName,
         Key: fileName,
-        Body: imageVO.buffer,
+        Body: buffer,
         ContentType: `image/${fileExtension}`,
       }),
     );
 
-    return `http://${this.localIp}:9000/${this.bucketName}/${fileName}`;
+    return `${this.localIp}/${this.bucketName}/${fileName}`;
   }
 }

@@ -1,29 +1,65 @@
+import { randomUUID } from 'crypto';
+import { MemoryComment } from './memory-comment';
+import { MemoryImage } from './memory-image';
 import { ImageMoodAgent } from './output/agents/image-mood.agent';
-import { ImageVO } from './vo/image.vo';
 
 export class Memory {
-  private readonly _images: ImageVO[];
-  private readonly _comment: string;
+  private readonly _id: string;
+  private readonly _memoryImages: MemoryImage[];
+  private readonly _memoryComments: MemoryComment[];
   private readonly _createdAt: Date;
+  private _happyScore: number;
+  private readonly _emotions: string[];
   private _summary: string | undefined;
 
-  constructor(images: ImageVO[], comment: string, createdAt?: Date) {
-    this._images = images;
-    this._comment = comment;
+  constructor({
+    id,
+    memoryImages,
+    memoryComments,
+    happyScore,
+    emotions,
+    createdAt,
+  }: {
+    id?: string;
+    memoryImages: MemoryImage[];
+    memoryComments: MemoryComment[];
+    happyScore?: number;
+    emotions: string[];
+    createdAt?: Date;
+    summary?: string;
+  }) {
+    this._id = id || randomUUID();
+    this._memoryImages = memoryImages;
+    this._memoryComments = memoryComments;
     this._createdAt = createdAt || new Date();
     this._summary = undefined;
+    this._happyScore = happyScore || 0;
+    this._emotions = emotions;
   }
 
-  async summarize(imageMoodAgent: ImageMoodAgent): Promise<void> {
-    this._summary = await imageMoodAgent.invoke(this._images, this._comment);
+  async summarize(
+    memoryImageBuffers: Buffer[],
+    imageMoodAgent: ImageMoodAgent,
+  ): Promise<void> {
+    const imageMoodAgentModel = await imageMoodAgent.invoke(
+      memoryImageBuffers,
+      this._memoryComments,
+    );
+
+    this._summary = imageMoodAgentModel.summary;
+    this._happyScore = imageMoodAgentModel.happyScore;
   }
 
-  get images() {
-    return this._images;
+  get id() {
+    return this._id;
   }
 
-  get comment() {
-    return this._comment;
+  get memoryImages() {
+    return this._memoryImages;
+  }
+
+  get memoryComments() {
+    return this._memoryComments;
   }
 
   get createdAt() {
@@ -32,5 +68,13 @@ export class Memory {
 
   get summary() {
     return this._summary;
+  }
+
+  get happyScore() {
+    return this._happyScore;
+  }
+
+  get emotions() {
+    return this._emotions;
   }
 }
