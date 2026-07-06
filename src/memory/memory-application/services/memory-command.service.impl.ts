@@ -29,7 +29,7 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
       return new MemoryImage({
         memoryId,
         filename: image.filename,
-        url: `${image.filename}`,
+        url: `/uploads/${image.filename}`,
       });
     });
 
