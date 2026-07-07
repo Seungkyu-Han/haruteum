@@ -56,6 +56,10 @@ export class OpenAIImageMoodAgent implements ImageMoodAgent {
 
     const finalOutput = result.finalOutput;
 
-    return new ImageMoodAgentModel(finalOutput.mood, finalOutput.happyScore);
+    return new ImageMoodAgentModel(
+      finalOutput.mood,
+      finalOutput.happyScore,
+      finalOutput.recommendedSong,
+    );
   }
 }

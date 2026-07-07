@@ -12,6 +12,6 @@ export class MockImageMoodAgent implements ImageMoodAgent {
     _memoryImageBuffers: Buffer[],
     _memoryComments: MemoryComment[],
   ): Promise<ImageMoodAgentModel> {
-    return Promise.resolve(new ImageMoodAgentModel(this.mood, 80));
+    return Promise.resolve(new ImageMoodAgentModel(this.mood, 80, ''));
   }
 }

@@ -20,6 +20,9 @@ export class MemoryEntity {
   @Column({ type: 'integer' })
   happyScore: number;
 
+  @Column({ type: 'text', nullable: true })
+  recommendedSong: string;
+
   @Column({ type: 'text' })
   emotion: string;
 
