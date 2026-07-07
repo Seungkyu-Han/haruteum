@@ -36,4 +36,10 @@ export class CreateMemoryResponseDto {
     example: '2023-10-01T12:00:00Z',
   })
   createdAt: Date;
+
+  @ApiProperty({
+    description: '추억에 맞는 추천 노래',
+    example: '아이유 - 좋은 날',
+  })
+  recommendedSong: string;
 }

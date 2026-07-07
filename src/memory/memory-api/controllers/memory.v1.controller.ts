@@ -96,6 +96,7 @@ export class MemoryController {
       comments: memory.memoryComments.map((comment) => comment.comment),
       emotions: memory.emotions,
       happyScore: memory.happyScore,
+      recommendedSong: memory.recommendedSong,
       createdAt: memory.createdAt,
     };
   }

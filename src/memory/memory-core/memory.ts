@@ -9,6 +9,7 @@ export class Memory {
   private readonly _memoryComments: MemoryComment[];
   private readonly _createdAt: Date;
   private _happyScore: number;
+  private _recommendedSong: string;
   private readonly _emotions: string[];
   private _summary: string | undefined;
 
@@ -17,6 +18,7 @@ export class Memory {
     memoryImages,
     memoryComments,
     happyScore,
+    recommendedSong,
     emotions,
     createdAt,
   }: {
@@ -24,6 +26,7 @@ export class Memory {
     memoryImages: MemoryImage[];
     memoryComments: MemoryComment[];
     happyScore?: number;
+    recommendedSong?: string;
     emotions: string[];
     createdAt?: Date;
     summary?: string;
@@ -34,6 +37,7 @@ export class Memory {
     this._createdAt = createdAt || new Date();
     this._summary = undefined;
     this._happyScore = happyScore || 0;
+    this._recommendedSong = recommendedSong || '';
     this._emotions = emotions;
   }
 
@@ -48,6 +52,7 @@ export class Memory {
 
     this._summary = imageMoodAgentModel.summary;
     this._happyScore = imageMoodAgentModel.happyScore;
+    this._recommendedSong = imageMoodAgentModel.recommendedSong;
   }
 
   get id() {
@@ -76,5 +81,9 @@ export class Memory {
 
   get emotions() {
     return this._emotions;
+  }
+
+  get recommendedSong() {
+    return this._recommendedSong;
   }
 }
