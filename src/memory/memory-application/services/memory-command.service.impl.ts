@@ -43,6 +43,7 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
 
     const memory = new Memory({
       id: memoryId,
+      mode: createMemoryCommand.mode,
       memoryImages,
       memoryComments,
       emotions: [createMemoryCommand.emotion],

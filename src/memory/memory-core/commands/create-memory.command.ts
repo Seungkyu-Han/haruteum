@@ -14,6 +14,7 @@ export class CreateMemoryCommand {
     public readonly imageCommands: CreateMemoryImageCommand[],
     public readonly commentCommands: createMemoryCommentCommand[],
     public readonly emotion: string,
+    public readonly mode: string,
     public readonly createdAt?: Date,
   ) {}
 }

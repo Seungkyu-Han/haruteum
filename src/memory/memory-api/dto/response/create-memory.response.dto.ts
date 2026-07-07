@@ -42,4 +42,9 @@ export class CreateMemoryResponseDto {
     example: '아이유 - 좋은 날',
   })
   recommendedSong: string;
+
+  @ApiProperty({
+    description: '추억 모드',
+  })
+  mode: string;
 }

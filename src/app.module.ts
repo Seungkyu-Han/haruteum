@@ -3,6 +3,7 @@ import { ConfigModule } from './config/config.module';
 import { MemoryModule } from './memory/memory.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path/posix';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { join } from 'path/posix';
       rootPath: join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads',
     }),
+    UserModule,
   ],
   controllers: [],
   providers: [],

@@ -15,6 +15,7 @@ export function memoryToDomain(memoryEntity: MemoryEntity): Memory {
     summary: memoryEntity.summary,
     happyScore: memoryEntity.happyScore,
     recommendedSong: memoryEntity.recommendedSong,
+    mode: memoryEntity.mode,
     emotions: [memoryEntity.emotion],
     memoryImages: memoryEntity.memoryImageEntities.map((imageEntity) =>
       memoryImageToDomain(imageEntity),
@@ -31,6 +32,7 @@ export function memoryToEntity(memory: Memory): MemoryEntity {
     id: memory.id,
     happyScore: memory.happyScore ?? 0,
     recommendedSong: memory.recommendedSong ?? '',
+    mode: memory.mode,
     emotion: memory.emotions[0] ?? 'neutral',
     summary: memory.summary,
     memoryImageEntities: memory.memoryImages.map((memoryImage) =>
