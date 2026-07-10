@@ -5,11 +5,13 @@ import { AUTH_SERVICE } from '../user-core/user.token';
 import { AuthServiceImpl } from './services/auth.service.impl';
 import { KakaoOauthService } from './services/oauth/kakao/kakao.oauth.service';
 import { ConfigModule } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
 
 @Module({
   imports: [
     HttpModule,
     UserInfraModule,
+    JwtModule,
     ConfigModule.forRoot({ isGlobal: false }),
   ],
   providers: [
