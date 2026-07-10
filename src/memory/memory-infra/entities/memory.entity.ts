@@ -23,6 +23,9 @@ export class MemoryEntity {
   @Column({ type: 'text', nullable: true })
   recommendedSong: string;
 
+  @Column({ type: 'text', nullable: true })
+  mode: string;
+
   @Column({ type: 'text' })
   emotion: string;
 

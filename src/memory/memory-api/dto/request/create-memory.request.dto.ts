@@ -22,4 +22,8 @@ export class CreateMemoryRequestDto {
     example: '행복해',
   })
   emotion: string;
+  @ApiProperty({
+    description: '추억 모드',
+  })
+  mode: string;
 }

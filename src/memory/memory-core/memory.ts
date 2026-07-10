@@ -12,6 +12,7 @@ export class Memory {
   private _recommendedSong: string;
   private readonly _emotions: string[];
   private _summary: string | undefined;
+  private readonly _mode: string;
 
   constructor({
     id,
@@ -19,6 +20,7 @@ export class Memory {
     memoryComments,
     happyScore,
     recommendedSong,
+    mode,
     emotions,
     createdAt,
   }: {
@@ -27,6 +29,7 @@ export class Memory {
     memoryComments: MemoryComment[];
     happyScore?: number;
     recommendedSong?: string;
+    mode: string;
     emotions: string[];
     createdAt?: Date;
     summary?: string;
@@ -37,6 +40,7 @@ export class Memory {
     this._createdAt = createdAt || new Date();
     this._summary = undefined;
     this._happyScore = happyScore || 0;
+    this._mode = mode;
     this._recommendedSong = recommendedSong || '';
     this._emotions = emotions;
   }
@@ -85,5 +89,9 @@ export class Memory {
 
   get recommendedSong() {
     return this._recommendedSong;
+  }
+
+  get mode() {
+    return this._mode;
   }
 }

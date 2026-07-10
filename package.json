@@ -21,6 +21,7 @@
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1051.0",
+    "@nestjs/axios": "^4.0.1",
     "@nestjs/common": "^11.0.1",
     "@nestjs/config": "^4.0.4",
     "@nestjs/core": "^11.0.1",
@@ -30,6 +31,8 @@
     "@nestjs/typeorm": "^11.0.1",
     "@openai/agents": "^0.11.4",
     "@seungkyu/error-reporter": "^0.0.10",
+    "axios": "^1.18.1",
+    "class-transformer": "^0.5.1",
     "express": "^5.2.1",
     "multer": "^2.1.1",
     "pg": "^8.21.0",

@@ -84,6 +84,7 @@ export class MemoryController {
       }),
       [new createMemoryCommentCommand(createMemoryRequestDto.comment)],
       createMemoryRequestDto.emotion,
+      createMemoryRequestDto.mode,
       new Date(),
     );
 
@@ -97,6 +98,7 @@ export class MemoryController {
       emotions: memory.emotions,
       happyScore: memory.happyScore,
       recommendedSong: memory.recommendedSong,
+      mode: memory.mode,
       createdAt: memory.createdAt,
     };
   }
