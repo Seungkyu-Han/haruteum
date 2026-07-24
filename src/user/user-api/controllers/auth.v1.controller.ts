@@ -1,19 +1,14 @@
-import {
-  Controller,
-  Get,
-  Headers,
-  Inject,
-  Post,
-  Query,
-  UseGuards,
-} from '@nestjs/common';
+import { Controller, Get, Inject, Query, Req, UseGuards } from '@nestjs/common';
 import type { IAuthService } from '../../user-core/input/services/auth.service';
 import { AUTH_SERVICE } from '../../user-core/user.token';
 import { TokenResponseDto } from '../dto/response/token.response.dto';
-import { AuthenticationGuard } from '../../../common/guards/authentication.guard';
-import { Authentication } from '../../../common/decorators/authentication.decorator';
-import { Principal } from '../../../common/types/principal';
 import { ApiBearerAuth } from '@nestjs/swagger';
+import type { Request } from 'express';
+import {
+  Authentication,
+  AuthenticationGuard,
+  Principal,
+} from '@seungkyu/guardian';
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthV1Controller {
@@ -34,12 +29,15 @@ export class AuthV1Controller {
     };
   }
 
-  @Post('kakao-login-token')
-  async kakaoLoginTokenApi(
-    @Headers('authorization') token: string,
-  ): Promise<TokenResponseDto> {
+  @Get('kakao-login-token')
+  @ApiBearerAuth('jwt')
+  async kakaoLoginTokenApi(@Req() req: Request): Promise<TokenResponseDto> {
+    const authorization = req.headers.authorization ?? '';
+    const token = authorization?.replace(/^Bearer\s+/i, '');
+
     const { accessToken, refreshToken } =
       await this.authService.oauthLoginByAccessToken(token, 'kakao');
+
     return {
       accessToken,
       refreshToken,
@@ -47,9 +45,23 @@ export class AuthV1Controller {
   }
 
   @UseGuards(AuthenticationGuard)
-  @ApiBearerAuth('jwt') // 👈 initSwagger의 'jwt' 키와 매칭!
+  @ApiBearerAuth('jwt')
   @Get('check')
   checkApi(@Authentication() principal: Principal) {
     return principal;
+  }
+
+  @Get('reissue')
+  @ApiBearerAuth('jwt')
+  async reissueApi(@Req() req: Request): Promise<TokenResponseDto> {
+    const authorization = req.headers.authorization ?? '';
+    const token = authorization?.replace(/^Bearer\s+/i, '');
+
+    const { accessToken, refreshToken } = await this.authService.reissue(token);
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   }
 }

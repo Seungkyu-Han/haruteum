@@ -62,6 +62,7 @@ export class KakaoOauthService {
   }
 
   async queryUserInfo(accessToken: string): Promise<QueryUserInfoResponseDto> {
+    console.log(accessToken);
     const config = {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',

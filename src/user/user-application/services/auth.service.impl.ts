@@ -4,9 +4,10 @@ import type { IUserRepository } from '../../user-core/output/user.repository';
 import { USER_REPOSITORY } from '../../user-core/user.token';
 import { KakaoOauthService } from './oauth/kakao/kakao.oauth.service';
 import { User } from '../../user-core/user';
-import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { JwtTokenSchema } from '../../user-core/schema/jwt-token.schema';
+import { JwtTokenGenerator, Principal } from '@seungkyu/guardian';
+import { JwtService } from '@nestjs/jwt';
 
 export class AuthServiceImpl implements IAuthService {
   private readonly jwtSecret: string;
@@ -16,9 +17,17 @@ export class AuthServiceImpl implements IAuthService {
     private readonly userRepository: IUserRepository,
     private readonly kakaoOauthService: KakaoOauthService,
     private readonly configService: ConfigService,
+    private readonly jwtTokenGenerator: JwtTokenGenerator,
     private readonly jwtService: JwtService,
   ) {
     this.jwtSecret = this.configService.getOrThrow('JWT_SECRET');
+  }
+  async reissue(token: string): Promise<JwtTokenSchema> {
+    const principal: Principal = await this.jwtService.verifyAsync(token, {
+      secret: this.jwtSecret,
+    });
+
+    return await this.createTokenByUserId(principal.id);
   }
 
   async oauthLoginByCode(code: string, type: 'kakao') {
@@ -86,23 +95,13 @@ export class AuthServiceImpl implements IAuthService {
   }
 
   private async createTokenByUserId(userId: string): Promise<JwtTokenSchema> {
-    const payload = { sub: userId };
+    const principal = new Principal(userId);
 
-    const accessToken = await this.jwtService.signAsync(
-      { ...payload, type: 'access' },
-      {
-        secret: this.jwtSecret,
-        expiresIn: '15m',
-      },
-    );
+    const accessToken =
+      await this.jwtTokenGenerator.generateAccessToken(principal);
 
-    const refreshToken = await this.jwtService.signAsync(
-      { ...payload, type: 'refresh' },
-      {
-        secret: this.jwtSecret,
-        expiresIn: '20m',
-      },
-    );
+    const refreshToken =
+      await this.jwtTokenGenerator.generateRefreshToken(principal);
 
     return {
       accessToken,
