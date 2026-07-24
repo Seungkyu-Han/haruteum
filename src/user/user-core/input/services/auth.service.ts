@@ -6,4 +6,5 @@ export interface IAuthService {
     accessToken: string,
     type: 'kakao',
   ): Promise<JwtTokenSchema>;
+  reissue(token: string): Promise<JwtTokenSchema>;
 }

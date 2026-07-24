@@ -5,9 +5,15 @@ import {
 } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ErrorReporterModule } from '@seungkyu/error-reporter';
+import { GuardianModule } from '@seungkyu/guardian';
 
 @Module({
   imports: [
+    GuardianModule.forRoot({
+      accessTokenOptions: {
+        secretKey: process.env.JWT_SECRET ?? '',
+      },
+    }),
     NestConfigModule.forRoot({
       isGlobal: false,
     }),

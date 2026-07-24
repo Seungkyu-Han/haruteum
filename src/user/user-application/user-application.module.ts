@@ -4,15 +4,19 @@ import { UserInfraModule } from '../user-infra/user-infra.module';
 import { AUTH_SERVICE } from '../user-core/user.token';
 import { AuthServiceImpl } from './services/auth.service.impl';
 import { KakaoOauthService } from './services/oauth/kakao/kakao.oauth.service';
-import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
+import { GuardianModule } from '@seungkyu/guardian';
 
 @Module({
   imports: [
     HttpModule,
     UserInfraModule,
     JwtModule,
-    ConfigModule.forRoot({ isGlobal: false }),
+    GuardianModule.forRoot({
+      accessTokenOptions: {
+        secretKey: process.env.JWT_SECRET ?? '',
+      },
+    }),
   ],
   providers: [
     {
