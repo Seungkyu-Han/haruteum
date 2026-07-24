@@ -1,5 +1,9 @@
 import { JwtTokenSchema } from '../../schema/jwt-token.schema';
 
 export interface IAuthService {
-  oauthLogin(code: string, type: 'kakao'): Promise<JwtTokenSchema>;
+  oauthLoginByCode(code: string, type: 'kakao'): Promise<JwtTokenSchema>;
+  oauthLoginByAccessToken(
+    accessToken: string,
+    type: 'kakao',
+  ): Promise<JwtTokenSchema>;
 }
