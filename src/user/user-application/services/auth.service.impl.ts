@@ -6,6 +6,7 @@ import { KakaoOauthService } from './oauth/kakao/kakao.oauth.service';
 import { User } from '../../user-core/user';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { JwtTokenSchema } from '../../user-core/schema/jwt-token.schema';
 
 export class AuthServiceImpl implements IAuthService {
   private readonly jwtSecret: string;
@@ -20,21 +21,72 @@ export class AuthServiceImpl implements IAuthService {
     this.jwtSecret = this.configService.getOrThrow('JWT_SECRET');
   }
 
-  async oauthLogin(code: string, type: 'kakao') {
-    let id: string | null = null;
+  async oauthLoginByCode(code: string, type: 'kakao') {
+    const accessToken = await this.requestAccessToken(code, type);
 
+    return await this.oauthLoginByAccessToken(accessToken, type);
+  }
+
+  async oauthLoginByAccessToken(
+    accessToken: string,
+    type: 'kakao',
+  ): Promise<JwtTokenSchema> {
+    const oauthId = await this.queryUserInfo(accessToken, type);
+
+    const user = await this.getUserByOauthId(oauthId, type);
+
+    return await this.createTokenByUserId(user.id);
+  }
+
+  private async requestAccessToken(
+    code: string,
+    type: 'kakao',
+  ): Promise<string> {
     switch (type) {
       case 'kakao': {
-        id = await this.kakaoOauthService.loginOauth(code);
+        const requestTokenResponseDto =
+          await this.kakaoOauthService.requestAccessToken(code);
+        return requestTokenResponseDto.access_token;
+      }
+      default:
+        throw new Error('Invalid OAuth type');
+    }
+  }
+
+  private async queryUserInfo(
+    accessToken: string,
+    type: 'kakao',
+  ): Promise<string> {
+    switch (type) {
+      case 'kakao': {
+        const requestTokenResponseDto =
+          await this.kakaoOauthService.queryUserInfo(accessToken);
+        return `${requestTokenResponseDto.id}`;
+      }
+      default:
+        throw new Error('Invalid OAuth type');
+    }
+  }
+
+  private async getUserByOauthId(
+    oauthId: string,
+    type: 'kakao',
+  ): Promise<User> {
+    let userId: string | undefined;
+    switch (type) {
+      case 'kakao': {
+        userId = await this.kakaoOauthService.getUserIdByOauthId(oauthId);
         break;
       }
       default:
         throw new Error('Invalid OAuth type');
     }
 
-    const user: User = await this.createUserIfNotExists(id);
+    return await this.createUserIfNotExists(userId);
+  }
 
-    const payload = { sub: user.id };
+  private async createTokenByUserId(userId: string): Promise<JwtTokenSchema> {
+    const payload = { sub: userId };
 
     const accessToken = await this.jwtService.signAsync(
       { ...payload, type: 'access' },
@@ -58,7 +110,7 @@ export class AuthServiceImpl implements IAuthService {
     };
   }
 
-  async createUserIfNotExists(id: string): Promise<User> {
+  private async createUserIfNotExists(id: string): Promise<User> {
     let user = await this.userRepository.findById(id);
 
     if (!user) {

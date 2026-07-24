@@ -26,9 +26,7 @@ export class KakaoOauthService {
       this.configService.getOrThrow<string>('KAKAO_REDIRECT_URI');
   }
 
-  private async requestToken(
-    code: string = 'code',
-  ): Promise<RequestTokenResponseDto> {
+  async requestAccessToken(code: string): Promise<RequestTokenResponseDto> {
     const payload = {
       grant_type: 'authorization_code',
       client_id: this.clientId,
@@ -63,9 +61,7 @@ export class KakaoOauthService {
     );
   }
 
-  private async queryUserInfo(
-    accessToken: string,
-  ): Promise<QueryUserInfoResponseDto> {
+  async queryUserInfo(accessToken: string): Promise<QueryUserInfoResponseDto> {
     const config = {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
@@ -85,8 +81,27 @@ export class KakaoOauthService {
     return new QueryUserInfoResponseDto(data.id);
   }
 
+  async getUserIdByOauthId(oauthId: string): Promise<string> {
+    const oauthNumberId = +oauthId;
+
+    const kakaoOauth =
+      await this.kakaoOauthRepository.findByKakaoId(oauthNumberId);
+
+    if (kakaoOauth) {
+      return kakaoOauth.userId;
+    }
+
+    const newKakaoOauth = new KakaoOauth({
+      kakaoId: oauthNumberId,
+    });
+
+    const savedKakaoOauth = await this.kakaoOauthRepository.save(newKakaoOauth);
+
+    return savedKakaoOauth.userId;
+  }
+
   async loginOauth(code: string): Promise<string> {
-    const tokenResponse = await this.requestToken(code);
+    const tokenResponse = await this.requestAccessToken(code);
     const userInfoResponse: QueryUserInfoResponseDto = await this.queryUserInfo(
       tokenResponse.access_token,
     );
