@@ -12,16 +12,17 @@ import {
 export function memoryToDomain(memoryEntity: MemoryEntity): Memory {
   return new Memory({
     id: memoryEntity.id,
+    userId: memoryEntity.userId,
     summary: memoryEntity.summary,
     happyScore: memoryEntity.happyScore,
     recommendedSong: memoryEntity.recommendedSong,
     mode: memoryEntity.mode,
     emotions: [memoryEntity.emotion],
     memoryImages: memoryEntity.memoryImageEntities.map((imageEntity) =>
-      memoryImageToDomain(imageEntity),
+      memoryImageToDomain(memoryEntity.id, imageEntity),
     ),
     memoryComments: memoryEntity.memoryCommentEntities.map((commentEntity) =>
-      memoryCommentToDomain(commentEntity),
+      memoryCommentToDomain(memoryEntity.id, commentEntity),
     ),
     createdAt: memoryEntity.createdAt,
   });
@@ -30,6 +31,7 @@ export function memoryToDomain(memoryEntity: MemoryEntity): Memory {
 export function memoryToEntity(memory: Memory): MemoryEntity {
   return {
     id: memory.id,
+    userId: memory.userId,
     happyScore: memory.happyScore ?? 0,
     recommendedSong: memory.recommendedSong ?? '',
     mode: memory.mode,
