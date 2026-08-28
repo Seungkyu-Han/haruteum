@@ -92,4 +92,15 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
 
     return memory;
   }
+
+  async deleteMemory(memoryId: string, userId: string): Promise<void> {
+    const memory = await this.memoryRepository.findById(memoryId);
+
+    if (!memory) throw new MemoryNotFoundException(memoryId);
+
+    if (memory.userId && memory.userId !== userId)
+      throw new MemoryUserMismatchException();
+
+    await this.memoryRepository.deleteById(memoryId);
+  }
 }

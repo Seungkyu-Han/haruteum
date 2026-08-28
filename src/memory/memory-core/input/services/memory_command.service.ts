@@ -8,4 +8,6 @@ export interface MemoryCommandService {
   ): Promise<Memory>;
 
   retrieveMemory(memoryId: string, userId?: string): Promise<Memory | null>;
+
+  deleteMemory(memoryId: string, userId: string): Promise<void>;
 }
