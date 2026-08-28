@@ -12,6 +12,8 @@ import {
   UseGuards,
   Delete,
   HttpCode,
+  Query,
+  BadRequestException,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -20,6 +22,7 @@ import {
   ApiOperation,
   ApiParam,
   ApiProduces,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
@@ -52,6 +55,65 @@ export class MemoryController {
     @Inject(MEMORY_COMMAND_SERVICE)
     private readonly memoryCommandService: MemoryCommandService,
   ) {}
+
+  @Get('/list')
+  @ApiBearerAuth('jwt')
+  @ApiProduces('application/json')
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '추억 조회 성공',
+    type: [MemoryResponseDto],
+  })
+  @ApiQuery({
+    name: 'page',
+    description: '페이지의 번호',
+    example: '1',
+    required: false,
+    type: 'number',
+  })
+  @ApiQuery({
+    name: 'pageSize',
+    description: '한페이지당 개수(default: 20)',
+    example: '20',
+    required: false,
+    type: 'number',
+  })
+  @ApiQuery({
+    name: 'start',
+    description: '조회 시작일',
+    example: '2020-08-18',
+    required: false,
+    type: Date,
+  })
+  @ApiQuery({
+    name: 'end',
+    description: '조회 마지막일',
+    example: '2022-02-17',
+    required: false,
+    type: Date,
+  })
+  async getMemoriesApi(
+    @Authentication() principal: Principal,
+    @Query('page') page?: number,
+    @Query('pageSize') pageSize?: number,
+    @Query('start') start?: Date,
+    @Query('end') end?: Date,
+  ): Promise<MemoryResponseDto[]> {
+    if ((start && end === undefined) || (start === undefined && end))
+      throw new BadRequestException(
+        'start와 end는 동시에 존재하거나, 존재하지 않아야합니다.',
+      );
+
+    const memories = await this.memoryCommandService.retrieveMemories(
+      principal.id,
+      page,
+      pageSize,
+      start,
+      end,
+    );
+
+    return memories.map((memory) => this.memoryToDto(memory));
+  }
 
   @Get('/:memoryId')
   @Public()
@@ -91,17 +153,7 @@ export class MemoryController {
     if (!memory)
       throw new NotFoundException(`Memory with ID ${memoryId} not found`);
 
-    return {
-      memoryId: memory.id,
-      summary: memory.summary || '',
-      images: memory.memoryImages.map((image) => `${image.url}`),
-      comments: memory.memoryComments.map((comment) => comment.comment),
-      emotions: memory.emotions,
-      happyScore: memory.happyScore,
-      recommendedSong: memory.recommendedSong,
-      mode: memory.mode,
-      createdAt: memory.createdAt,
-    };
+    return this.memoryToDto(memory);
   }
 
   @Post('/create')
@@ -144,17 +196,7 @@ export class MemoryController {
       principal?.id,
     );
 
-    return {
-      memoryId: memory.id,
-      summary: memory.summary || '',
-      images: memory.memoryImages.map((image) => `${image.url}`),
-      comments: memory.memoryComments.map((comment) => comment.comment),
-      emotions: memory.emotions,
-      happyScore: memory.happyScore,
-      recommendedSong: memory.recommendedSong,
-      mode: memory.mode,
-      createdAt: memory.createdAt,
-    };
+    return this.memoryToDto(memory);
   }
 
   @Delete('/:memoryId')
@@ -175,5 +217,19 @@ export class MemoryController {
     @Authentication() principal?: Principal,
   ): Promise<undefined> {
     await this.memoryCommandService.deleteMemory(memoryId, principal?.id);
+  }
+
+  private memoryToDto(memory: Memory): MemoryResponseDto {
+    return {
+      memoryId: memory.id,
+      summary: memory.summary || '',
+      images: memory.memoryImages.map((image) => `${image.url}`),
+      comments: memory.memoryComments.map((comment) => comment.comment),
+      emotions: memory.emotions,
+      happyScore: memory.happyScore,
+      recommendedSong: memory.recommendedSong,
+      mode: memory.mode,
+      createdAt: memory.createdAt,
+    };
   }
 }
