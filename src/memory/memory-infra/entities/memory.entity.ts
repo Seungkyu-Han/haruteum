@@ -5,6 +5,7 @@ import {
   DeleteDateColumn,
   OneToMany,
   Column,
+  Index,
 } from 'typeorm';
 import { MemoryCommentEntity } from './memory-comment.entity';
 import { MemoryImageEntity } from './memory-image.entity';
@@ -15,6 +16,7 @@ export class MemoryEntity {
   id: string;
 
   @Column({ type: 'uuid', nullable: true })
+  @Index()
   userId?: string;
 
   @Column({ type: 'text', nullable: true })
