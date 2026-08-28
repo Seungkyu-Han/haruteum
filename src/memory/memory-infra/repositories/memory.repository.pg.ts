@@ -36,4 +36,8 @@ export class MemoryRepositoryPg implements IMemoryRepository {
 
     return memoryToDomain(memoryEntity);
   }
+
+  async deleteById(id: string): Promise<void> {
+    await this.memoryRepository.delete(id);
+  }
 }
