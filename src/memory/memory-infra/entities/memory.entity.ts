@@ -11,6 +11,7 @@ import { MemoryCommentEntity } from './memory-comment.entity';
 import { MemoryImageEntity } from './memory-image.entity';
 
 @Entity('memories')
+@Index('idx_memories_user_id_id', ['userId', 'id'])
 export class MemoryEntity {
   @PrimaryColumn({ type: 'uuid' })
   id: string;

@@ -16,4 +16,5 @@ export interface IMemoryRepository {
     pageSize?: number,
     page?: number,
   ): Promise<Memory[]>;
+  existsByUserIdAndIdLessThan(userId: string, id: string): Promise<boolean>;
 }

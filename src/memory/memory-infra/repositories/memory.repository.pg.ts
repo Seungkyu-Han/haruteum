@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { IMemoryRepository } from '../../memory-core/output/repositories/memory.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MemoryEntity } from '../entities/memory.entity';
-import { Between, Repository } from 'typeorm';
+import { Between, Repository, LessThan } from 'typeorm';
 import { Memory } from '../../memory-core/memory';
 import { memoryToEntity, memoryToDomain } from '../mappers/memory.mapper';
 
@@ -55,7 +55,7 @@ export class MemoryRepositoryPg implements IMemoryRepository {
       const memoryEntities = await this.memoryRepository.find({
         where: { userId },
         relations,
-        order: { createdAt: 'DESC' },
+        order: { id: 'DESC' },
       });
 
       return memoryEntities.map(memoryToDomain);
@@ -68,7 +68,7 @@ export class MemoryRepositoryPg implements IMemoryRepository {
     const memoryEntities = await this.memoryRepository.find({
       where: { userId },
       relations,
-      order: { createdAt: 'DESC' },
+      order: { id: 'DESC' },
       skip,
       take: currentLimit,
     });
@@ -97,7 +97,7 @@ export class MemoryRepositoryPg implements IMemoryRepository {
       const memoryEntities = await this.memoryRepository.find({
         where,
         relations,
-        order: { createdAt: 'DESC' },
+        order: { id: 'DESC' },
       });
 
       return memoryEntities.map(memoryToDomain);
@@ -110,11 +110,23 @@ export class MemoryRepositoryPg implements IMemoryRepository {
     const memoryEntities = await this.memoryRepository.find({
       where,
       relations,
-      order: { createdAt: 'DESC' },
+      order: { id: 'DESC' },
       skip,
       take: currentLimit,
     });
 
     return memoryEntities.map(memoryToDomain);
+  }
+
+  async existsByUserIdAndIdLessThan(
+    userId: string,
+    id: string,
+  ): Promise<boolean> {
+    return await this.memoryRepository.exists({
+      where: {
+        userId: userId,
+        id: LessThan(id),
+      },
+    });
   }
 }

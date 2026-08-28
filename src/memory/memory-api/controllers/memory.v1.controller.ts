@@ -28,7 +28,10 @@ import {
 } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import type { MemoryCommandService } from '../../memory-core/input/services/memory-command.service';
-import { MEMORY_COMMAND_SERVICE } from '../../memory-core/memory.token';
+import {
+  MEMORY_COMMAND_SERVICE,
+  MEMORY_QUERY_SERVICE,
+} from '../../memory-core/memory.token';
 import { CreateMemoryRequestDto } from '../dto/request/create-memory.request.dto';
 import { MemoryResponseDto } from '../dto/response/memory.response.dto';
 import {
@@ -46,6 +49,9 @@ import {
 import { MapError } from '@seungkyu/error-mapper';
 import { MemoryUserMismatchException } from '../../memory-application/exceptions/memory-user-mismatch.exception';
 import { MemoryNotFoundException } from '../../memory-application/exceptions/memory-not-found.exception';
+import { MemoryElementResponseDto } from '../dto/response/memory-element.response.dto';
+import type { MemoryQueryService } from '../../memory-core/input/services/memory-query.service';
+import { MemoryListResponseDto } from '../dto/response/memory-list.response.dto';
 
 @ApiTags('memory')
 @UseGuards(AuthenticationGuard)
@@ -54,6 +60,8 @@ export class MemoryController {
   constructor(
     @Inject(MEMORY_COMMAND_SERVICE)
     private readonly memoryCommandService: MemoryCommandService,
+    @Inject(MEMORY_QUERY_SERVICE)
+    private readonly memoryQueryService: MemoryQueryService,
   ) {}
 
   @Get('/list')
@@ -98,7 +106,7 @@ export class MemoryController {
     @Query('pageSize') pageSize?: number,
     @Query('start') start?: Date,
     @Query('end') end?: Date,
-  ): Promise<MemoryResponseDto[]> {
+  ): Promise<MemoryListResponseDto> {
     if ((start && end === undefined) || (start === undefined && end))
       throw new BadRequestException(
         'start와 end는 동시에 존재하거나, 존재하지 않아야합니다.',
@@ -112,7 +120,22 @@ export class MemoryController {
       end,
     );
 
-    return memories.map((memory) => this.memoryToDto(memory));
+    const memoryElementDtoList = memories.map((memory) =>
+      this.memoryToElementDto(memory),
+    );
+
+    const hasNext =
+      memories.length > 0
+        ? await this.memoryQueryService.existsNextPage(
+            principal.id,
+            memories.at(-1)!.id,
+          )
+        : false;
+
+    return {
+      memories: memoryElementDtoList,
+      hasNext,
+    };
   }
 
   @Get('/:memoryId')
@@ -230,6 +253,16 @@ export class MemoryController {
       recommendedSong: memory.recommendedSong,
       mode: memory.mode,
       createdAt: memory.createdAt,
+    };
+  }
+
+  private memoryToElementDto(memory: Memory): MemoryElementResponseDto {
+    return {
+      memoryId: memory.id,
+      createdAt: memory.createdAt,
+      emotions: memory.emotions,
+      happyScore: memory.happyScore,
+      images: memory.memoryImages.map((memoryImage) => memoryImage.url),
     };
   }
 }
