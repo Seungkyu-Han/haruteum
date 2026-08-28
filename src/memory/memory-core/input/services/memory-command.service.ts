@@ -9,5 +9,13 @@ export interface MemoryCommandService {
 
   retrieveMemory(memoryId: string, userId?: string): Promise<Memory | null>;
 
+  retrieveMemories(
+    userId: string,
+    page?: number,
+    pageSize?: number,
+    start?: Date,
+    end?: Date,
+  ): Promise<Memory[]>;
+
   deleteMemory(memoryId: string, userId?: string): Promise<void>;
 }

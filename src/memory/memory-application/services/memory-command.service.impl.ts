@@ -1,6 +1,6 @@
 import type { ImageMoodAgent } from '../../memory-core/output/agents/image-mood.agent';
 import { Inject, Injectable } from '@nestjs/common';
-import { MemoryCommandService } from '../../memory-core/input/services/memory_command.service';
+import { MemoryCommandService } from '../../memory-core/input/services/memory-command.service';
 import {
   IMAGE_MOOD_AGENT,
   MEMORY_IMAGE_STORAGE,
@@ -42,6 +42,50 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
     }
 
     return memory;
+  }
+
+  async retrieveMemories(
+    userId: string,
+    page?: number,
+    pageSize?: number,
+    start?: Date,
+    end?: Date,
+  ): Promise<Memory[]> {
+    let modifiedStart: Date | undefined;
+    let modifiedEnd: Date | undefined;
+
+    if (start) {
+      modifiedStart = new Date(start);
+      modifiedStart.setHours(0, 0, 0, 0);
+    }
+
+    if (end) {
+      modifiedEnd = new Date(end);
+      modifiedEnd.setDate(modifiedEnd.getDate() + 1);
+      modifiedEnd.setHours(0, 0, 0, 0);
+    }
+    if (modifiedStart && modifiedEnd) {
+      if (page || pageSize)
+        return await this.memoryRepository.findByUserIdAndCreatedAtBetween(
+          userId,
+          modifiedStart,
+          modifiedEnd,
+          pageSize,
+          page,
+        );
+      else
+        return await this.memoryRepository.findByUserIdAndCreatedAtBetween(
+          userId,
+          modifiedStart,
+          modifiedEnd,
+        );
+    }
+
+    if (page || pageSize) {
+      return await this.memoryRepository.findByUserId(userId, pageSize, page);
+    } else {
+      return await this.memoryRepository.findByUserId(userId);
+    }
   }
 
   async createMemory(

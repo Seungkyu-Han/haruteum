@@ -24,7 +24,7 @@ import {
   ApiTags,
 } from '@nestjs/swagger';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import type { MemoryCommandService } from '../../memory-core/input/services/memory_command.service';
+import type { MemoryCommandService } from '../../memory-core/input/services/memory-command.service';
 import { MEMORY_COMMAND_SERVICE } from '../../memory-core/memory.token';
 import { CreateMemoryRequestDto } from '../dto/request/create-memory.request.dto';
 import { MemoryResponseDto } from '../dto/response/memory.response.dto';
