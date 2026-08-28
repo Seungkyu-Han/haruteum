@@ -1,7 +1,7 @@
-import { randomUUID } from 'crypto';
 import { MemoryComment } from './memory-comment';
 import { MemoryImage } from './memory-image';
 import { ImageMoodAgent } from './output/agents/image-mood.agent';
+import { v7 as uuidv7 } from 'uuid';
 
 export class Memory {
   private readonly _id: string;
@@ -37,7 +37,7 @@ export class Memory {
     createdAt?: Date;
     summary?: string;
   }) {
-    this._id = id || randomUUID();
+    this._id = id || uuidv7();
     this._userId = userId;
     this._memoryImages = memoryImages;
     this._memoryComments = memoryComments;
