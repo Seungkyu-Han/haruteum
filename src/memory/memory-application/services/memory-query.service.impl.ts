@@ -11,9 +11,6 @@ export class MemoryQueryServiceImpl implements MemoryQueryService {
   ) {}
 
   async existsNextPage(userId: string, memoryId: string): Promise<boolean> {
-    return this.memoryRepository.existsByUserIdAndIdGreaterThan(
-      userId,
-      memoryId,
-    );
+    return this.memoryRepository.existsByUserIdAndIdLessThan(userId, memoryId);
   }
 }
