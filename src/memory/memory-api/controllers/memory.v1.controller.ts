@@ -5,7 +5,6 @@ import {
   HttpStatus,
   Inject,
   Param,
-  ParseFilePipe,
   Post,
   UploadedFiles,
   UseInterceptors,
@@ -20,10 +19,7 @@ import {
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger';
-import * as fs from 'node:fs';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { extname } from 'path';
 import type { MemoryCommandService } from '../../memory-core/input/services/memory_command.service';
 import { MEMORY_COMMAND_SERVICE } from '../../memory-core/memory.token';
 import { CreateMemoryRequestDto } from '../dto/request/create-memory.request.dto';
@@ -86,6 +82,7 @@ export class MemoryController {
   @ApiBody({
     type: CreateMemoryRequestDto,
   })
+  @UseInterceptors(FilesInterceptor('files'))
   @ApiResponse({
     status: HttpStatus.OK,
     description: '추억 생성 성공',
@@ -95,33 +92,15 @@ export class MemoryController {
     summary: 'summary',
     description: 'description',
   })
-  @UseInterceptors(
-    FilesInterceptor('files', 10, {
-      storage: diskStorage({
-        destination: './uploads',
-        filename: (req, file, cb) => {
-          const uniqueSuffix =
-            Date.now() + '-' + Math.round(Math.random() * 1e9);
-          const ext = extname(file.originalname);
-          cb(null, `${uniqueSuffix}${ext}`);
-        },
-      }),
-    }),
-  )
   async createMemory(
-    @UploadedFiles(
-      new ParseFilePipe({
-        errorHttpStatusCode: HttpStatus.BAD_REQUEST,
-      }),
-    )
-    files: Express.Multer.File[],
+    @UploadedFiles() files: Express.Multer.File[],
     @Body() createMemoryRequestDto: CreateMemoryRequestDto,
   ): Promise<MemoryResponseDto> {
     const createMemoryCommand = new CreateMemoryCommand(
       files.map((file) => {
-        const fileBuffer: Buffer = fs.readFileSync(file.path);
+        const fileBuffer: Buffer = file.buffer;
 
-        return new CreateMemoryImageCommand(file.filename, fileBuffer);
+        return new CreateMemoryImageCommand(file.originalname, fileBuffer);
       }),
       [new createMemoryCommentCommand(createMemoryRequestDto.comment)],
       createMemoryRequestDto.emotion,

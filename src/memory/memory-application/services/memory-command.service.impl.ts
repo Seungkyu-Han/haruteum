@@ -3,6 +3,7 @@ import { Inject, Injectable } from '@nestjs/common';
 import { MemoryCommandService } from '../../memory-core/input/services/memory_command.service';
 import {
   IMAGE_MOOD_AGENT,
+  MEMORY_IMAGE_STORAGE,
   MEMORY_REPOSITORY,
 } from '../../memory-core/memory.token';
 import { CreateMemoryCommand } from '../../memory-core/commands/create-memory.command';
@@ -11,13 +12,17 @@ import { MemoryImage } from '../../memory-core/memory-image';
 import { MemoryComment } from '../../memory-core/memory-comment';
 import { randomUUID } from 'crypto';
 import type { IMemoryRepository } from '../../memory-core/output/repositories/memory.repository';
+import type { MemoryImageStorage } from '../../memory-core/output/storages/memory-image.storage';
 
 @Injectable()
 export class MemoryCommandServiceImpl implements MemoryCommandService {
   constructor(
-    @Inject(IMAGE_MOOD_AGENT) private readonly imageMoodAgent: ImageMoodAgent,
+    @Inject(IMAGE_MOOD_AGENT)
+    private readonly imageMoodAgent: ImageMoodAgent,
     @Inject(MEMORY_REPOSITORY)
     private readonly memoryRepository: IMemoryRepository,
+    @Inject(MEMORY_IMAGE_STORAGE)
+    private readonly memoryImageStorage: MemoryImageStorage,
   ) {}
 
   retrieveMemory(memoryId: string): Promise<Memory | null> {
@@ -29,13 +34,20 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
   ): Promise<Memory> {
     const memoryId: string = randomUUID();
 
-    const memoryImages = createMemoryCommand.imageCommands.map((image) => {
-      return new MemoryImage({
-        memoryId,
-        filename: image.filename,
-        url: `/uploads/${image.filename}`,
-      });
-    });
+    const memoryImages = await Promise.all(
+      createMemoryCommand.imageCommands.map(async (image) => {
+        const filePath = await this.memoryImageStorage.saveImage(
+          image.filename,
+          image.buffer,
+        );
+
+        return new MemoryImage({
+          memoryId,
+          filename: image.filename,
+          url: filePath,
+        });
+      }),
+    );
 
     const memoryComments = createMemoryCommand.commentCommands.map(
       (commentCommand) =>
