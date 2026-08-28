@@ -4,6 +4,7 @@ import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 @ApiSchema({ name: '추억 리스트 응답 API DTO' })
 export class MemoryListResponseDto {
   @ApiProperty({
+    type: [MemoryElementResponseDto],
     description: '추억 요소들',
   })
   memories: MemoryElementResponseDto[];

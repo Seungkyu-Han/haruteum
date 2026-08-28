@@ -70,7 +70,7 @@ export class MemoryController {
   @ApiResponse({
     status: HttpStatus.OK,
     description: '추억 조회 성공',
-    type: [MemoryResponseDto],
+    type: MemoryListResponseDto,
   })
   @ApiQuery({
     name: 'page',
