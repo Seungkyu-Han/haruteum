@@ -25,12 +25,26 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
     private readonly memoryImageStorage: MemoryImageStorage,
   ) {}
 
-  retrieveMemory(memoryId: string): Promise<Memory | null> {
-    return this.memoryRepository.findById(memoryId);
+  async retrieveMemory(
+    memoryId: string,
+    userId?: string,
+  ): Promise<Memory | null> {
+    const memory = await this.memoryRepository.findById(memoryId);
+
+    if (!memory) {
+      throw new Error('Memory not found');
+    }
+
+    if (memory.userId && memory.userId !== userId) {
+      throw new Error('Unauthorized');
+    }
+
+    return memory;
   }
 
   async createMemory(
     createMemoryCommand: CreateMemoryCommand,
+    userId: string,
   ): Promise<Memory> {
     const memoryId: string = randomUUID();
 
@@ -59,7 +73,7 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
 
     const memory = new Memory({
       id: memoryId,
-      userId: randomUUID(),
+      userId: userId,
       mode: createMemoryCommand.mode,
       memoryImages,
       memoryComments,
