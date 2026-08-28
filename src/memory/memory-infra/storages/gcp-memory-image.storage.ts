@@ -1,6 +1,7 @@
 import { Injectable, InternalServerErrorException } from '@nestjs/common';
 import { Storage } from '@google-cloud/storage';
 import { MemoryImageStorage } from '../../memory-core/output/storages/memory-image.storage';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class GcpMemoryImageStorage implements MemoryImageStorage {
@@ -20,8 +21,11 @@ export class GcpMemoryImageStorage implements MemoryImageStorage {
   }
 
   async saveImage(filename: string, buffer: Buffer): Promise<string> {
+    const ext = filename.split('.').pop()?.toLowerCase();
+    const uuidFileName = ext ? `${randomUUID()}.${ext}` : randomUUID();
+
     const bucket = this.storage.bucket(this.bucketName);
-    const file = bucket.file(filename);
+    const file = bucket.file(uuidFileName);
 
     return new Promise((resolve, reject) => {
       const writeStream = file.createWriteStream({
@@ -40,7 +44,7 @@ export class GcpMemoryImageStorage implements MemoryImageStorage {
       });
 
       writeStream.on('finish', () => {
-        const publicUrl = `https://storage.googleapis.com/${this.bucketName}/${filename}`;
+        const publicUrl = `https://storage.googleapis.com/${this.bucketName}/${uuidFileName}`;
         resolve(publicUrl);
       });
 
