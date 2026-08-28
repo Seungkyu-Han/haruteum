@@ -4,10 +4,10 @@ import { Memory } from '../../memory';
 export interface MemoryCommandService {
   createMemory(
     createMemoryCommand: CreateMemoryCommand,
-    userId: string,
+    userId?: string,
   ): Promise<Memory>;
 
   retrieveMemory(memoryId: string, userId?: string): Promise<Memory | null>;
 
-  deleteMemory(memoryId: string, userId: string): Promise<void>;
+  deleteMemory(memoryId: string, userId?: string): Promise<void>;
 }

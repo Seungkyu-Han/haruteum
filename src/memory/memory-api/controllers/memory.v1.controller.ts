@@ -10,6 +10,8 @@ import {
   UseInterceptors,
   NotFoundException,
   UseGuards,
+  Delete,
+  HttpCode,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -103,6 +105,7 @@ export class MemoryController {
   }
 
   @Post('/create')
+  @Public()
   @ApiBearerAuth('jwt')
   @ApiConsumes('multipart/form-data')
   @ApiProduces('application/json')
@@ -122,7 +125,7 @@ export class MemoryController {
   async createMemory(
     @UploadedFiles() files: Express.Multer.File[],
     @Body() createMemoryRequestDto: CreateMemoryRequestDto,
-    @Authentication() principal: Principal,
+    @Authentication() principal?: Principal,
   ): Promise<MemoryResponseDto> {
     const createMemoryCommand = new CreateMemoryCommand(
       files.map((file) => {
@@ -138,7 +141,7 @@ export class MemoryController {
 
     const memory: Memory = await this.memoryCommandService.createMemory(
       createMemoryCommand,
-      principal.id,
+      principal?.id,
     );
 
     return {
@@ -152,5 +155,25 @@ export class MemoryController {
       mode: memory.mode,
       createdAt: memory.createdAt,
     };
+  }
+
+  @Delete('/:memoryId')
+  @Public()
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiBearerAuth('jwt')
+  @ApiProduces('application/json')
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: '추억 삭제 성공',
+  })
+  @ApiOperation({
+    summary: '추억을 삭제합니다.',
+    description: 'description',
+  })
+  async deleteMemoryApi(
+    @Param('memoryId') memoryId: string,
+    @Authentication() principal?: Principal,
+  ): Promise<undefined> {
+    await this.memoryCommandService.deleteMemory(memoryId, principal?.id);
   }
 }

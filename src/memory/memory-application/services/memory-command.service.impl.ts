@@ -46,7 +46,7 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
 
   async createMemory(
     createMemoryCommand: CreateMemoryCommand,
-    userId: string,
+    userId?: string,
   ): Promise<Memory> {
     const memoryId: string = randomUUID();
 
@@ -93,7 +93,7 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
     return memory;
   }
 
-  async deleteMemory(memoryId: string, userId: string): Promise<void> {
+  async deleteMemory(memoryId: string, userId?: string): Promise<void> {
     const memory = await this.memoryRepository.findById(memoryId);
 
     if (!memory) throw new MemoryNotFoundException(memoryId);
