@@ -3,7 +3,7 @@ import { Storage } from '@google-cloud/storage';
 import { MemoryImageStorage } from '../../memory-core/output/storages/memory-image.storage';
 
 @Injectable()
-export class GoogleMemoryImageStorage implements MemoryImageStorage {
+export class GcpMemoryImageStorage implements MemoryImageStorage {
   private readonly storage: Storage;
   private readonly bucketName: string;
 
