@@ -14,6 +14,9 @@ export class MemoryEntity {
   @PrimaryColumn({ type: 'uuid' })
   id: string;
 
+  @Column({ type: 'uuid', nullable: true })
+  userId?: string;
+
   @Column({ type: 'text', nullable: true })
   summary?: string;
 

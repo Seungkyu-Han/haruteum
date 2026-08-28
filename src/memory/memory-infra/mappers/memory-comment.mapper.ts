@@ -3,11 +3,12 @@ import { MemoryCommentEntity } from '../entities/memory-comment.entity';
 import { MemoryEntity } from '../entities/memory.entity';
 
 export function memoryCommentToDomain(
+  memoryId: string,
   memoryCommentEntity: MemoryCommentEntity,
 ): MemoryComment {
   return new MemoryComment({
     id: memoryCommentEntity.id,
-    memoryId: memoryCommentEntity.memoryEntity.id,
+    memoryId: memoryId,
     comment: memoryCommentEntity.comment,
     createdAt: memoryCommentEntity.createdAt,
   });

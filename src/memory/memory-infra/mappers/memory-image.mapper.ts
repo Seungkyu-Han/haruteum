@@ -3,11 +3,12 @@ import { MemoryImageEntity } from '../entities/memory-image.entity';
 import { MemoryEntity } from '../entities/memory.entity';
 
 export function memoryImageToDomain(
+  memoryId: string,
   memoryImageEntity: MemoryImageEntity,
 ): MemoryImage {
   return new MemoryImage({
     id: memoryImageEntity.id,
-    memoryId: memoryImageEntity.memoryEntity.id,
+    memoryId: memoryId,
     filename: memoryImageEntity.filename,
     url: memoryImageEntity.url,
   });

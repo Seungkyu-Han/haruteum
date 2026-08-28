@@ -5,6 +5,7 @@ import { ImageMoodAgent } from './output/agents/image-mood.agent';
 
 export class Memory {
   private readonly _id: string;
+  private readonly _userId?: string;
   private readonly _memoryImages: MemoryImage[];
   private readonly _memoryComments: MemoryComment[];
   private readonly _createdAt: Date;
@@ -16,6 +17,7 @@ export class Memory {
 
   constructor({
     id,
+    userId,
     memoryImages,
     memoryComments,
     happyScore,
@@ -25,6 +27,7 @@ export class Memory {
     createdAt,
   }: {
     id?: string;
+    userId?: string;
     memoryImages: MemoryImage[];
     memoryComments: MemoryComment[];
     happyScore?: number;
@@ -35,6 +38,7 @@ export class Memory {
     summary?: string;
   }) {
     this._id = id || randomUUID();
+    this._userId = userId;
     this._memoryImages = memoryImages;
     this._memoryComments = memoryComments;
     this._createdAt = createdAt || new Date();
@@ -57,6 +61,10 @@ export class Memory {
     this._summary = imageMoodAgentModel.summary;
     this._happyScore = imageMoodAgentModel.happyScore;
     this._recommendedSong = imageMoodAgentModel.recommendedSong;
+  }
+
+  get userId() {
+    return this._userId;
   }
 
   get id() {

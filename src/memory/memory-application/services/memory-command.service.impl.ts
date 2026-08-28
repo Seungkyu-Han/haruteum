@@ -20,6 +20,10 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
     private readonly memoryRepository: IMemoryRepository,
   ) {}
 
+  retrieveMemory(memoryId: string): Promise<Memory | null> {
+    return this.memoryRepository.findById(memoryId);
+  }
+
   async createMemory(
     createMemoryCommand: CreateMemoryCommand,
   ): Promise<Memory> {
@@ -43,6 +47,7 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
 
     const memory = new Memory({
       id: memoryId,
+      userId: randomUUID(),
       mode: createMemoryCommand.mode,
       memoryImages,
       memoryComments,

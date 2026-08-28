@@ -8,6 +8,7 @@ import {
   Authentication,
   AuthenticationGuard,
   Principal,
+  Public,
 } from '@seungkyu/guardian';
 
 @Controller({ path: 'auth', version: '1' })
@@ -47,7 +48,9 @@ export class AuthV1Controller {
   @UseGuards(AuthenticationGuard)
   @ApiBearerAuth('jwt')
   @Get('check')
-  checkApi(@Authentication() principal: Principal) {
+  @Public()
+  checkApi(@Authentication() principal?: Principal) {
+    console.log('principal', principal);
     return principal;
   }
 

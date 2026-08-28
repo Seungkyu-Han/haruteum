@@ -4,7 +4,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { MemoryEntity } from '../entities/memory.entity';
 import { Repository } from 'typeorm';
 import { Memory } from '../../memory-core/memory';
-import { memoryToEntity } from '../mappers/memory.mapper';
+import { memoryToEntity, memoryToDomain } from '../mappers/memory.mapper';
 
 @Injectable()
 export class MemoryRepositoryPg implements IMemoryRepository {
@@ -19,5 +19,21 @@ export class MemoryRepositoryPg implements IMemoryRepository {
     await this.memoryRepository.save(memoryEntity);
 
     return memory;
+  }
+
+  async findById(id: string): Promise<Memory | null> {
+    const memoryEntity = await this.memoryRepository.findOne({
+      where: { id },
+      relations: {
+        memoryCommentEntities: true,
+        memoryImageEntities: true,
+      },
+    });
+
+    if (!memoryEntity) {
+      return null;
+    }
+
+    return memoryToDomain(memoryEntity);
   }
 }
