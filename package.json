@@ -32,6 +32,7 @@
     "@nestjs/swagger": "^11.4.3",
     "@nestjs/typeorm": "^11.0.1",
     "@openai/agents": "^0.11.4",
+    "@seungkyu/error-mapper": "^0.1.5",
     "@seungkyu/error-reporter": "^0.0.10",
     "@seungkyu/guardian": "^0.0.6",
     "axios": "^1.18.1",
