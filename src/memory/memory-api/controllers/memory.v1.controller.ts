@@ -38,6 +38,9 @@ import {
   Principal,
   Public,
 } from '@seungkyu/guardian';
+import { MapError } from '@seungkyu/error-mapper';
+import { MemoryUserMismatchException } from '../../memory-application/exceptions/memory-user-mismatch.exception';
+import { MemoryNotFoundException } from '../../memory-application/exceptions/memory-not-found.exception';
 
 @ApiTags('memory')
 @UseGuards(AuthenticationGuard)
@@ -67,6 +70,14 @@ export class MemoryController {
     example: '123e4567-e89b-12d3-a456-426614174000',
     required: true,
     type: String,
+  })
+  @MapError({
+    sourceError: MemoryUserMismatchException,
+    status: HttpStatus.FORBIDDEN,
+  })
+  @MapError({
+    sourceError: MemoryNotFoundException,
+    status: HttpStatus.NOT_FOUND,
   })
   async getMemory(
     @Param('memoryId') memoryId: string,

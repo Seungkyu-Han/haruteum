@@ -13,6 +13,8 @@ import { MemoryComment } from '../../memory-core/memory-comment';
 import { randomUUID } from 'crypto';
 import type { IMemoryRepository } from '../../memory-core/output/repositories/memory.repository';
 import type { MemoryImageStorage } from '../../memory-core/output/storages/memory-image.storage';
+import { MemoryNotFoundException } from '../exceptions/memory-not-found.exception';
+import { MemoryUserMismatchException } from '../exceptions/memory-user-mismatch.exception';
 
 @Injectable()
 export class MemoryCommandServiceImpl implements MemoryCommandService {
@@ -32,11 +34,11 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
     const memory = await this.memoryRepository.findById(memoryId);
 
     if (!memory) {
-      throw new Error('Memory not found');
+      throw new MemoryNotFoundException(memoryId);
     }
 
     if (memory.userId && memory.userId !== userId) {
-      throw new Error('Unauthorized');
+      throw new MemoryUserMismatchException();
     }
 
     return memory;
