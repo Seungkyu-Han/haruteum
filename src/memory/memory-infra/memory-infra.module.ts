@@ -12,7 +12,7 @@ import { MemoryImageEntity } from './entities/memory-image.entity';
 import { MemoryCommentEntity } from './entities/memory-comment.entity';
 import { MemoryEntity } from './entities/memory.entity';
 import { MemoryRepositoryPg } from './repositories/memory.repository.pg';
-import { GoogleMemoryImageStorage } from './storages/google-memory-image.storage';
+import { GcpMemoryImageStorage } from './storages/gcp-memory-image.storage';
 
 @Module({
   imports: [
@@ -55,7 +55,7 @@ import { GoogleMemoryImageStorage } from './storages/google-memory-image.storage
 
         switch (imageStorageType) {
           default:
-            return new GoogleMemoryImageStorage(
+            return new GcpMemoryImageStorage(
               configService.getOrThrow<string>('BUCKET_NAME'),
               configService.get<string>('KEY_FILENAME'),
             );
