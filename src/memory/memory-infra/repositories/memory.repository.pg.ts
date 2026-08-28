@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { IMemoryRepository } from '../../memory-core/output/repositories/memory.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MemoryEntity } from '../entities/memory.entity';
-import { Between, Repository } from 'typeorm';
+import { Between, Repository, MoreThan } from 'typeorm';
 import { Memory } from '../../memory-core/memory';
 import { memoryToEntity, memoryToDomain } from '../mappers/memory.mapper';
 
@@ -116,5 +116,17 @@ export class MemoryRepositoryPg implements IMemoryRepository {
     });
 
     return memoryEntities.map(memoryToDomain);
+  }
+
+  async existsByUserIdAndIdGreaterThan(
+    userId: string,
+    id: string,
+  ): Promise<boolean> {
+    return await this.memoryRepository.exists({
+      where: {
+        userId: userId,
+        id: MoreThan(id),
+      },
+    });
   }
 }
