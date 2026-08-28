@@ -13,6 +13,8 @@ import { MemoryComment } from '../../memory-core/memory-comment';
 import { randomUUID } from 'crypto';
 import type { IMemoryRepository } from '../../memory-core/output/repositories/memory.repository';
 import type { MemoryImageStorage } from '../../memory-core/output/storages/memory-image.storage';
+import { MemoryNotFoundException } from '../exceptions/memory-not-found.exception';
+import { MemoryUserMismatchException } from '../exceptions/memory-user-mismatch.exception';
 
 @Injectable()
 export class MemoryCommandServiceImpl implements MemoryCommandService {
@@ -25,12 +27,26 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
     private readonly memoryImageStorage: MemoryImageStorage,
   ) {}
 
-  retrieveMemory(memoryId: string): Promise<Memory | null> {
-    return this.memoryRepository.findById(memoryId);
+  async retrieveMemory(
+    memoryId: string,
+    userId?: string,
+  ): Promise<Memory | null> {
+    const memory = await this.memoryRepository.findById(memoryId);
+
+    if (!memory) {
+      throw new MemoryNotFoundException(memoryId);
+    }
+
+    if (memory.userId && memory.userId !== userId) {
+      throw new MemoryUserMismatchException();
+    }
+
+    return memory;
   }
 
   async createMemory(
     createMemoryCommand: CreateMemoryCommand,
+    userId: string,
   ): Promise<Memory> {
     const memoryId: string = randomUUID();
 
@@ -59,7 +75,7 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
 
     const memory = new Memory({
       id: memoryId,
-      userId: randomUUID(),
+      userId: userId,
       mode: createMemoryCommand.mode,
       memoryImages,
       memoryComments,

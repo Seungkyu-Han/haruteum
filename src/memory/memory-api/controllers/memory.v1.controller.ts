@@ -9,8 +9,10 @@ import {
   UploadedFiles,
   UseInterceptors,
   NotFoundException,
+  UseGuards,
 } from '@nestjs/common';
 import {
+  ApiBearerAuth,
   ApiBody,
   ApiConsumes,
   ApiOperation,
@@ -30,8 +32,18 @@ import {
   createMemoryCommentCommand,
 } from '../../memory-core/commands/create-memory.command';
 import { Memory } from '../../memory-core/memory';
+import {
+  Authentication,
+  AuthenticationGuard,
+  Principal,
+  Public,
+} from '@seungkyu/guardian';
+import { MapError } from '@seungkyu/error-mapper';
+import { MemoryUserMismatchException } from '../../memory-application/exceptions/memory-user-mismatch.exception';
+import { MemoryNotFoundException } from '../../memory-application/exceptions/memory-not-found.exception';
 
 @ApiTags('memory')
+@UseGuards(AuthenticationGuard)
 @Controller({ path: 'memory', version: '1' })
 export class MemoryController {
   constructor(
@@ -40,6 +52,8 @@ export class MemoryController {
   ) {}
 
   @Get('/:memoryId')
+  @Public()
+  @ApiBearerAuth('jwt')
   @ApiProduces('application/json')
   @ApiResponse({
     status: HttpStatus.OK,
@@ -57,12 +71,24 @@ export class MemoryController {
     required: true,
     type: String,
   })
-  async getMemory(@Param('memoryId') memoryId: string) {
+  @MapError({
+    sourceError: MemoryUserMismatchException,
+    status: HttpStatus.FORBIDDEN,
+  })
+  @MapError({
+    sourceError: MemoryNotFoundException,
+    status: HttpStatus.NOT_FOUND,
+  })
+  async getMemory(
+    @Param('memoryId') memoryId: string,
+    @Authentication() principal?: Principal,
+  ) {
     const memory: Memory | null =
-      await this.memoryCommandService.retrieveMemory(memoryId);
+      await this.memoryCommandService.retrieveMemory(memoryId, principal?.id);
 
     if (!memory)
       throw new NotFoundException(`Memory with ID ${memoryId} not found`);
+
     return {
       memoryId: memory.id,
       summary: memory.summary || '',
@@ -77,6 +103,7 @@ export class MemoryController {
   }
 
   @Post('/create')
+  @ApiBearerAuth('jwt')
   @ApiConsumes('multipart/form-data')
   @ApiProduces('application/json')
   @ApiBody({
@@ -95,6 +122,7 @@ export class MemoryController {
   async createMemory(
     @UploadedFiles() files: Express.Multer.File[],
     @Body() createMemoryRequestDto: CreateMemoryRequestDto,
+    @Authentication() principal: Principal,
   ): Promise<MemoryResponseDto> {
     const createMemoryCommand = new CreateMemoryCommand(
       files.map((file) => {
@@ -108,8 +136,10 @@ export class MemoryController {
       new Date(),
     );
 
-    const memory: Memory =
-      await this.memoryCommandService.createMemory(createMemoryCommand);
+    const memory: Memory = await this.memoryCommandService.createMemory(
+      createMemoryCommand,
+      principal.id,
+    );
 
     return {
       memoryId: memory.id,
