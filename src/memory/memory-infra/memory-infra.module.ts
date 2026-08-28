@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import {
   IMAGE_MOOD_AGENT,
+  MEMORY_IMAGE_STORAGE,
   MEMORY_REPOSITORY,
 } from '../memory-core/memory.token';
 import { OpenAIImageMoodAgent } from './agents/openai_image_mood_agent';
@@ -11,6 +12,7 @@ import { MemoryImageEntity } from './entities/memory-image.entity';
 import { MemoryCommentEntity } from './entities/memory-comment.entity';
 import { MemoryEntity } from './entities/memory.entity';
 import { MemoryRepositoryPg } from './repositories/memory.repository.pg';
+import { GcpMemoryImageStorage } from './storages/gcp-memory-image.storage';
 
 @Module({
   imports: [
@@ -44,7 +46,23 @@ import { MemoryRepositoryPg } from './repositories/memory.repository.pg';
         }
       },
     },
+    {
+      inject: [ConfigService],
+      provide: MEMORY_IMAGE_STORAGE,
+      useFactory: (configService: ConfigService) => {
+        const imageStorageType =
+          configService.getOrThrow<string>('IMAGE_STORAGE_TYPE');
+
+        switch (imageStorageType) {
+          default:
+            return new GcpMemoryImageStorage(
+              configService.getOrThrow<string>('BUCKET_NAME'),
+              configService.get<string>('KEY_FILENAME'),
+            );
+        }
+      },
+    },
   ],
-  exports: [IMAGE_MOOD_AGENT, MEMORY_REPOSITORY],
+  exports: [IMAGE_MOOD_AGENT, MEMORY_REPOSITORY, MEMORY_IMAGE_STORAGE],
 })
 export class MemoryInfraModule {}
