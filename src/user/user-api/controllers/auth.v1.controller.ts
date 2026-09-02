@@ -2,6 +2,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
   Inject,
   Query,
   Req,
@@ -10,7 +11,12 @@ import {
 import type { IAuthService } from '../../user-core/input/services/auth.service';
 import { AUTH_SERVICE } from '../../user-core/user.token';
 import { TokenResponseDto } from '../dto/response/token.response.dto';
-import { ApiBearerAuth } from '@nestjs/swagger';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiQuery,
+  ApiResponse,
+} from '@nestjs/swagger';
 import type { Request } from 'express';
 import {
   Authentication,
@@ -18,6 +24,8 @@ import {
   Principal,
   Public,
 } from '@seungkyu/guardian';
+import { MapError } from '@seungkyu/error-mapper';
+import { WithdrawUserException } from '../../user-core/exceptions/withdraw-user.exception';
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthV1Controller {
@@ -27,6 +35,29 @@ export class AuthV1Controller {
   ) {}
 
   @Get('kakao-login-code')
+  @ApiOperation({
+    summary: '카카오 인가 코드로 로그인',
+    description: '카카오 OAuth 인가 코드를 받아 토큰을 발급합니다.',
+  })
+  @ApiQuery({
+    name: 'code',
+    required: true,
+    description: '카카오 OAuth 인가 코드',
+    example: 'abc-123',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '로그인 성공',
+    type: TokenResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: '탈퇴한 회원입니다.',
+  })
+  @MapError({
+    sourceError: WithdrawUserException,
+    status: HttpStatus.NOT_FOUND,
+  })
   async kakaoLoginCodeApi(
     @Query('code') code: string,
   ): Promise<TokenResponseDto> {
@@ -40,6 +71,23 @@ export class AuthV1Controller {
 
   @Get('kakao-login-token')
   @ApiBearerAuth('jwt')
+  @ApiOperation({
+    summary: '카카오 인가 토큰으로 로그인',
+    description: '카카오 OAuth 토큰으로 서비스의 토큰을 발급합니다.',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: '로그인 성공',
+    type: TokenResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: '탈퇴한 회원입니다.',
+  })
+  @MapError({
+    sourceError: WithdrawUserException,
+    status: HttpStatus.NOT_FOUND,
+  })
   async kakaoLoginTokenApi(@Req() req: Request): Promise<TokenResponseDto> {
     const authorization = req.headers.authorization ?? '';
     const token = authorization?.replace(/^Bearer\s+/i, '');
