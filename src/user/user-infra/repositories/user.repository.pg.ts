@@ -21,8 +21,11 @@ export class UserRepositoryPg implements IUserRepository {
     return user;
   }
 
-  async findById(id: string): Promise<User | null> {
-    const userEntity = await this.userRepository.findOne({ where: { id } });
+  async findByIdWithDeleted(id: string): Promise<User | null> {
+    const userEntity = await this.userRepository.findOne({
+      where: { id },
+      withDeleted: true,
+    });
     return userEntity ? userToDomain(userEntity) : null;
   }
 
