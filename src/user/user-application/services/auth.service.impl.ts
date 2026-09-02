@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtTokenSchema } from '../../user-core/schema/jwt-token.schema';
 import { JwtTokenGenerator, Principal } from '@seungkyu/guardian';
 import { JwtService } from '@nestjs/jwt';
+import { TokenExpiredException } from '../../user-core/exceptions/token-expired.exception';
 
 export class AuthServiceImpl implements IAuthService {
   private readonly jwtSecret: string;
@@ -23,11 +24,19 @@ export class AuthServiceImpl implements IAuthService {
     this.jwtSecret = this.configService.getOrThrow('JWT_SECRET');
   }
   async reissue(token: string): Promise<JwtTokenSchema> {
-    const principal: Principal = await this.jwtService.verifyAsync(token, {
-      secret: this.jwtSecret,
-    });
+    try {
+      const principal: Principal = await this.jwtService.verifyAsync(token, {
+        secret: this.jwtSecret,
+      });
 
-    return await this.createTokenByUserId(principal.id, true);
+      return await this.createTokenByUserId(principal.id, true);
+    } catch (e: unknown) {
+      if (e instanceof Error && e.name === 'TokenExpiredError') {
+        throw new TokenExpiredException();
+      }
+
+      throw new Error('Invalid token');
+    }
   }
 
   async oauthLoginByCode(code: string, type: 'kakao') {

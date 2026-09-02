@@ -27,6 +27,8 @@ import {
   Principal,
   Public,
 } from '@seungkyu/guardian';
+import { MapError } from '@seungkyu/error-mapper';
+import { TokenExpiredException } from '../../user-core/exceptions/token-expired.exception';
 
 @ApiTags('인증 API')
 @Controller({ path: 'auth', version: '1' })
@@ -100,6 +102,18 @@ export class AuthV1Controller {
 
   @Get('reissue')
   @ApiBearerAuth('jwt')
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: '토큰 생성에 성공했습니다',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: '해당 토큰이 만료되었습니다.',
+  })
+  @MapError({
+    sourceError: TokenExpiredException,
+    status: 401,
+  })
   async reissueApi(@Req() req: Request): Promise<TokenResponseDto> {
     const authorization = req.headers.authorization ?? '';
     const token = authorization?.replace(/^Bearer\s+/i, '');
