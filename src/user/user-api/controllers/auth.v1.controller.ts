@@ -126,6 +126,7 @@ export class AuthV1Controller {
   }
 
   @Delete('me')
+  @UseGuards(AuthenticationGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBearerAuth('jwt')
   @ApiOperation({
