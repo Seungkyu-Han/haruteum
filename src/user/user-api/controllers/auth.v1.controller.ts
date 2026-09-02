@@ -29,6 +29,7 @@ import {
 } from '@seungkyu/guardian';
 import { MapError } from '@seungkyu/error-mapper';
 import { TokenExpiredException } from '../../user-core/exceptions/token-expired.exception';
+import { KakaoOauthNotFoundException } from '../../user-core/exceptions/kakao-oauth-not-found.exception';
 
 @ApiTags('인증 API')
 @Controller({ path: 'auth', version: '1' })
@@ -137,6 +138,14 @@ export class AuthV1Controller {
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: '탈퇴 성공했습니다.',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: '해당 사용자의 카카오 정보를 찾을 수 없습니다.',
+  })
+  @MapError({
+    sourceError: KakaoOauthNotFoundException,
+    status: HttpStatus.NOT_FOUND,
   })
   async withdrawApi(@Authentication() principal: Principal) {
     await this.authService.withdraw(principal.id);
