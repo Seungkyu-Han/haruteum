@@ -14,14 +14,14 @@ export class UserCommandServiceImpl implements IUserCommandService {
 
   async updateUserInfo(
     userId: string,
-    name?: string,
+    nickname?: string,
     email?: string,
   ): Promise<User> {
     const user: User | null = await this.userRepository.findById(userId);
 
     if (!user) throw new UserNotFoundException();
 
-    user.name = name;
+    user.nickname = nickname;
     user.email = email;
 
     return await this.userRepository.save(user);

@@ -7,13 +7,16 @@ import { QueryUserInfoResponseDto } from './dto/response/query-user-info.respons
 import type { IKakaoOauthRepository } from '../../../../user-core/output/kakao-oauth.repository';
 import { KakaoOauth } from '../../../../user-core/kakao-oauth';
 import { KAKAO_OAUTH_REPOSITORY } from '../../../../user-core/user.token';
+import { KakaoOauthNotFoundException } from '../../../../user-core/exceptions/kakao-oauth-not-found.exception';
 
 @Injectable()
 export class KakaoOauthService {
   private readonly clientId: string;
   private readonly kakaoRedirectUri: string;
+  private readonly kakaoAppAdminKey: string;
   private readonly kakaoTokenServer = 'https://kauth.kakao.com/oauth/token';
   private readonly kakaoUserServer = 'https://kapi.kakao.com/v2/user/me';
+  private readonly kakaoUnlinkServer = 'https://kapi.kakao.com/v1/user/unlink';
 
   constructor(
     private readonly configService: ConfigService,
@@ -24,6 +27,9 @@ export class KakaoOauthService {
     this.clientId = this.configService.getOrThrow<string>('KAKAO_CLIENT_ID');
     this.kakaoRedirectUri =
       this.configService.getOrThrow<string>('KAKAO_REDIRECT_URI');
+    this.kakaoAppAdminKey = this.configService.getOrThrow<string>(
+      'KAKAO_APP_ADMIN_KEY',
+    );
   }
 
   async requestAccessToken(code: string): Promise<RequestTokenResponseDto> {
@@ -100,26 +106,25 @@ export class KakaoOauthService {
     return savedKakaoOauth.userId;
   }
 
-  async loginOauth(code: string): Promise<string> {
-    const tokenResponse = await this.requestAccessToken(code);
-    const userInfoResponse: QueryUserInfoResponseDto = await this.queryUserInfo(
-      tokenResponse.access_token,
+  async unlink(userId: string): Promise<void> {
+    const kakaoOauth = await this.kakaoOauthRepository.findByUserId(userId);
+
+    if (!kakaoOauth) throw new KakaoOauthNotFoundException();
+
+    const config = {
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+        Authorization: `KakaoAK ${this.kakaoAppAdminKey}`,
+      },
+    };
+
+    const payload = {
+      target_id_type: 'user_id',
+      target_id: kakaoOauth.kakaoId,
+    };
+
+    await firstValueFrom(
+      this.httpService.post<any>(this.kakaoUnlinkServer, payload, config),
     );
-
-    const kakaoOauth = await this.kakaoOauthRepository.findByKakaoId(
-      userInfoResponse.id,
-    );
-
-    if (kakaoOauth) {
-      return kakaoOauth.userId;
-    }
-
-    const newKakaoOauth = new KakaoOauth({
-      kakaoId: userInfoResponse.id,
-    });
-
-    const savedKakaoOauth = await this.kakaoOauthRepository.save(newKakaoOauth);
-
-    return savedKakaoOauth.userId;
   }
 }

@@ -9,7 +9,7 @@ export class UserEntity {
   email?: string;
 
   @Column({ type: 'text', nullable: true })
-  name?: string;
+  nickname?: string;
 
   @Column({ type: 'timestamp' })
   createdAt: Date;

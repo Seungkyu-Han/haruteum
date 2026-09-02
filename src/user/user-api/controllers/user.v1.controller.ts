@@ -64,7 +64,7 @@ export class UserV1Controller {
     const user = await this.userQueryService.userInfoById(principal.id);
 
     return {
-      name: user.name,
+      nickname: user.nickname,
       email: user.email,
     };
   }
@@ -92,12 +92,12 @@ export class UserV1Controller {
   ): Promise<UserMeResponseDto> {
     const user = await this.userCommandService.updateUserInfo(
       principal.id,
-      userMeRequestDto.name,
+      userMeRequestDto.nickname,
       userMeRequestDto.email,
     );
 
     return {
-      name: user.name,
+      nickname: user.nickname,
       email: user.email,
     };
   }

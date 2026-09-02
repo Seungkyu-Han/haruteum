@@ -140,6 +140,7 @@ export class AuthServiceImpl implements IAuthService {
   }
 
   async withdraw(userId: string): Promise<void> {
+    await this.kakaoOauthService.unlink(userId);
     await this.userRepository.deleteById(userId);
   }
 

@@ -33,4 +33,16 @@ export class KakaoOauthRepositoryPg implements IKakaoOauthRepository {
 
     return kakaoOauthToDomain(kakaoOauthEntity);
   }
+
+  async findByUserId(userId: string): Promise<KakaoOauth | null> {
+    const kakaoOauthEntity = await this.kakaoOauthRepository.findOne({
+      where: { userId },
+    });
+
+    if (!kakaoOauthEntity) {
+      return null;
+    }
+
+    return kakaoOauthToDomain(kakaoOauthEntity);
+  }
 }
