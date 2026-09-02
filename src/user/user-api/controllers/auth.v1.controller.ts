@@ -5,6 +5,7 @@ import {
   HttpCode,
   HttpStatus,
   Inject,
+  Post,
   Query,
   Req,
   UseGuards,
@@ -123,5 +124,20 @@ export class AuthV1Controller {
   })
   async withdrawApi(@Authentication() principal: Principal) {
     await this.authService.withdraw(principal.id);
+  }
+
+  @Post('me/restore')
+  @UseGuards(AuthenticationGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiBearerAuth('jwt')
+  @ApiOperation({
+    summary: '탈퇴한 사용자를 복구합니다..',
+  })
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: '복구 성공했습니다.',
+  })
+  async restoreUserApi(@Authentication() principal: Principal) {
+    await this.authService.restoreUser(principal.id);
   }
 }
