@@ -25,8 +25,6 @@ import {
   Principal,
   Public,
 } from '@seungkyu/guardian';
-import { MapError } from '@seungkyu/error-mapper';
-import { WithdrawUserException } from '../../user-core/exceptions/withdraw-user.exception';
 
 @Controller({ path: 'auth', version: '1' })
 export class AuthV1Controller {
@@ -51,22 +49,15 @@ export class AuthV1Controller {
     description: '로그인 성공',
     type: TokenResponseDto,
   })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: '탈퇴한 회원입니다.',
-  })
-  @MapError({
-    sourceError: WithdrawUserException,
-    status: HttpStatus.NOT_FOUND,
-  })
   async kakaoLoginCodeApi(
     @Query('code') code: string,
   ): Promise<TokenResponseDto> {
-    const { accessToken, refreshToken } =
+    const { accessToken, refreshToken, withdraw } =
       await this.authService.oauthLoginByCode(code, 'kakao');
     return {
       accessToken,
       refreshToken,
+      withdraw,
     };
   }
 
@@ -81,24 +72,17 @@ export class AuthV1Controller {
     description: '로그인 성공',
     type: TokenResponseDto,
   })
-  @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: '탈퇴한 회원입니다.',
-  })
-  @MapError({
-    sourceError: WithdrawUserException,
-    status: HttpStatus.NOT_FOUND,
-  })
   async kakaoLoginTokenApi(@Req() req: Request): Promise<TokenResponseDto> {
     const authorization = req.headers.authorization ?? '';
     const token = authorization?.replace(/^Bearer\s+/i, '');
 
-    const { accessToken, refreshToken } =
+    const { accessToken, refreshToken, withdraw } =
       await this.authService.oauthLoginByAccessToken(token, 'kakao');
 
     return {
       accessToken,
       refreshToken,
+      withdraw,
     };
   }
 
@@ -122,6 +106,7 @@ export class AuthV1Controller {
     return {
       accessToken,
       refreshToken,
+      withdraw: false,
     };
   }
 

@@ -8,7 +8,6 @@ import { ConfigService } from '@nestjs/config';
 import { JwtTokenSchema } from '../../user-core/schema/jwt-token.schema';
 import { JwtTokenGenerator, Principal } from '@seungkyu/guardian';
 import { JwtService } from '@nestjs/jwt';
-import { WithdrawUserException } from '../../user-core/exceptions/withdraw-user.exception';
 
 export class AuthServiceImpl implements IAuthService {
   private readonly jwtSecret: string;
@@ -28,7 +27,7 @@ export class AuthServiceImpl implements IAuthService {
       secret: this.jwtSecret,
     });
 
-    return await this.createTokenByUserId(principal.id);
+    return await this.createTokenByUserId(principal.id, true);
   }
 
   async oauthLoginByCode(code: string, type: 'kakao') {
@@ -45,7 +44,11 @@ export class AuthServiceImpl implements IAuthService {
 
     const user = await this.getUserByOauthId(oauthId, type);
 
-    return await this.createTokenByUserId(user.id);
+    let isEnabled = true;
+
+    if (user.isDeleted()) isEnabled = false;
+
+    return await this.createTokenByUserId(user.id, isEnabled);
   }
 
   private async requestAccessToken(
@@ -95,8 +98,11 @@ export class AuthServiceImpl implements IAuthService {
     return await this.createUserIfNotExists(userId);
   }
 
-  private async createTokenByUserId(userId: string): Promise<JwtTokenSchema> {
-    const principal = new Principal(userId);
+  private async createTokenByUserId(
+    userId: string,
+    isEnabled: boolean,
+  ): Promise<JwtTokenSchema> {
+    const principal = new Principal(userId, isEnabled);
 
     const accessToken =
       await this.jwtTokenGenerator.generateAccessToken(principal);
@@ -107,13 +113,12 @@ export class AuthServiceImpl implements IAuthService {
     return {
       accessToken,
       refreshToken,
+      withdraw: !isEnabled,
     };
   }
 
   private async createUserIfNotExists(id: string): Promise<User> {
     let user = await this.userRepository.findByIdWithDeleted(id);
-
-    if (user?.isDeleted()) throw new WithdrawUserException();
 
     if (!user) {
       user = new User({
