@@ -16,5 +16,5 @@ export class UserMeRequestDto {
     example: '한승규',
   })
   @IsOptional()
-  name?: string;
+  nickname?: string;
 }

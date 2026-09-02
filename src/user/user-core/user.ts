@@ -3,26 +3,26 @@ import { randomUUID } from 'crypto';
 export class User {
   private readonly _id: string;
   private _email: string | undefined;
-  private _name: string | undefined;
+  private _nickname: string | undefined;
   private readonly _createdAt: Date;
   private readonly _deletedAt: Date | undefined;
 
   constructor({
     id,
     email,
-    name,
+    nickname,
     createdAt,
     deletedAt,
   }: {
     id?: string;
     email?: string;
-    name?: string;
+    nickname?: string;
     createdAt?: Date;
     deletedAt?: Date;
   }) {
     this._id = id || randomUUID();
     this._email = email;
-    this._name = name;
+    this._nickname = nickname;
     this._createdAt = createdAt || new Date();
     this._deletedAt = deletedAt;
   }
@@ -35,8 +35,8 @@ export class User {
     return this._email;
   }
 
-  get name(): string | undefined {
-    return this._name;
+  get nickname(): string | undefined {
+    return this._nickname;
   }
 
   get createdAt() {
@@ -47,8 +47,8 @@ export class User {
     return this._deletedAt;
   }
 
-  set name(name: string | undefined) {
-    this._name = name;
+  set nickname(nickname: string | undefined) {
+    this._nickname = nickname;
   }
 
   set email(email: string | undefined) {

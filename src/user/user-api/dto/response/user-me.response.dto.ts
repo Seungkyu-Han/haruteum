@@ -12,5 +12,5 @@ export class UserMeResponseDto {
     description: '해당 사용자의 닉네임',
     example: '한승규',
   })
-  name?: string;
+  nickname?: string;
 }
