@@ -121,4 +121,8 @@ export class AuthServiceImpl implements IAuthService {
 
     return user;
   }
+
+  async withdraw(userId: string): Promise<void> {
+    await this.userRepository.deleteById(userId);
+  }
 }
