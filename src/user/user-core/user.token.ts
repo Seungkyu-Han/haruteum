@@ -1,4 +1,5 @@
 export const AUTH_SERVICE = Symbol('AUTH_SERVICE');
+export const USER_QUERY_SERVICE = Symbol('USER_QUERY_SERVICE');
 
 export const USER_REPOSITORY = Symbol('USER_REPOSITORY');
 export const KAKAO_OAUTH_REPOSITORY = Symbol('KAKAO_OAUTH_REPOSITORY');
