@@ -2,8 +2,8 @@ import { randomUUID } from 'crypto';
 
 export class User {
   private readonly _id: string;
-  private readonly _email: string | undefined;
-  private readonly _name: string | undefined;
+  private _email: string | undefined;
+  private _name: string | undefined;
   private readonly _createdAt: Date;
   private readonly _deletedAt: Date | undefined;
 
@@ -31,11 +31,11 @@ export class User {
     return this._id;
   }
 
-  get email() {
+  get email(): string | undefined {
     return this._email;
   }
 
-  get name() {
+  get name(): string | undefined {
     return this._name;
   }
 
@@ -45,6 +45,14 @@ export class User {
 
   get deletedAt() {
     return this._deletedAt;
+  }
+
+  set name(name: string | undefined) {
+    this._name = name;
+  }
+
+  set email(email: string | undefined) {
+    this._email = email;
   }
 
   isDeleted() {

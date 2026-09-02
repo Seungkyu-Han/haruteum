@@ -37,6 +37,7 @@
     "@seungkyu/guardian": "^0.0.6",
     "axios": "^1.18.1",
     "class-transformer": "^0.5.1",
+    "class-validator": "^0.15.1",
     "express": "^5.2.1",
     "multer": "^2.1.1",
     "pg": "^8.21.0",

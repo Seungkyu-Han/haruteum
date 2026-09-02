@@ -53,7 +53,7 @@ import { MemoryElementResponseDto } from '../dto/response/memory-element.respons
 import type { MemoryQueryService } from '../../memory-core/input/services/memory-query.service';
 import { MemoryListResponseDto } from '../dto/response/memory-list.response.dto';
 
-@ApiTags('memory')
+@ApiTags('추억 API')
 @UseGuards(AuthenticationGuard)
 @Controller({ path: 'memory', version: '1' })
 export class MemoryController {
