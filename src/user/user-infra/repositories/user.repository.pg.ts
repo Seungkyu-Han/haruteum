@@ -25,4 +25,8 @@ export class UserRepositoryPg implements IUserRepository {
     const userEntity = await this.userRepository.findOne({ where: { id } });
     return userEntity ? userToDomain(userEntity) : null;
   }
+
+  async deleteById(id: string): Promise<void> {
+    await this.userRepository.softDelete(id);
+  }
 }

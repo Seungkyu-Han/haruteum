@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { Column, DeleteDateColumn, Entity, PrimaryColumn } from 'typeorm';
 
 @Entity('users')
 export class UserEntity {
@@ -13,4 +13,7 @@ export class UserEntity {
 
   @Column({ type: 'timestamp' })
   createdAt: Date;
+
+  @DeleteDateColumn({ type: 'timestamp', nullable: true })
+  deletedAt?: string;
 }
