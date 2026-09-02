@@ -15,5 +15,5 @@ export class UserEntity {
   createdAt: Date;
 
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
-  deletedAt?: string;
+  deletedAt?: Date;
 }

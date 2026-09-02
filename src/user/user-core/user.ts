@@ -5,22 +5,26 @@ export class User {
   private readonly _email: string | undefined;
   private readonly _name: string | undefined;
   private readonly _createdAt: Date;
+  private readonly _deletedAt: Date | undefined;
 
   constructor({
     id,
     email,
     name,
     createdAt,
+    deletedAt,
   }: {
     id?: string;
     email?: string;
     name?: string;
     createdAt?: Date;
+    deletedAt?: Date;
   }) {
     this._id = id || randomUUID();
     this._email = email;
     this._name = name;
     this._createdAt = createdAt || new Date();
+    this._deletedAt = deletedAt;
   }
 
   get id() {
@@ -37,5 +41,13 @@ export class User {
 
   get createdAt() {
     return this._createdAt;
+  }
+
+  get deletedAt() {
+    return this._deletedAt;
+  }
+
+  isDeleted() {
+    return !!this._deletedAt;
   }
 }
