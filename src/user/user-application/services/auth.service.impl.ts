@@ -27,7 +27,7 @@ export class AuthServiceImpl implements IAuthService {
       secret: this.jwtSecret,
     });
 
-    return await this.createTokenByUserId(principal.id);
+    return await this.createTokenByUserId(principal.id, true);
   }
 
   async oauthLoginByCode(code: string, type: 'kakao') {
@@ -44,7 +44,11 @@ export class AuthServiceImpl implements IAuthService {
 
     const user = await this.getUserByOauthId(oauthId, type);
 
-    return await this.createTokenByUserId(user.id);
+    let isEnabled = true;
+
+    if (user.isDeleted()) isEnabled = false;
+
+    return await this.createTokenByUserId(user.id, isEnabled);
   }
 
   private async requestAccessToken(
@@ -94,8 +98,11 @@ export class AuthServiceImpl implements IAuthService {
     return await this.createUserIfNotExists(userId);
   }
 
-  private async createTokenByUserId(userId: string): Promise<JwtTokenSchema> {
-    const principal = new Principal(userId);
+  private async createTokenByUserId(
+    userId: string,
+    isEnabled: boolean,
+  ): Promise<JwtTokenSchema> {
+    const principal = new Principal(userId, isEnabled);
 
     const accessToken =
       await this.jwtTokenGenerator.generateAccessToken(principal);
@@ -106,11 +113,12 @@ export class AuthServiceImpl implements IAuthService {
     return {
       accessToken,
       refreshToken,
+      withdraw: !isEnabled,
     };
   }
 
   private async createUserIfNotExists(id: string): Promise<User> {
-    let user = await this.userRepository.findById(id);
+    let user = await this.userRepository.findByIdWithDeleted(id);
 
     if (!user) {
       user = new User({
@@ -120,5 +128,13 @@ export class AuthServiceImpl implements IAuthService {
     }
 
     return user;
+  }
+
+  async withdraw(userId: string): Promise<void> {
+    await this.userRepository.deleteById(userId);
+  }
+
+  async restoreUser(userId: string): Promise<void> {
+    await this.userRepository.restore(userId);
   }
 }

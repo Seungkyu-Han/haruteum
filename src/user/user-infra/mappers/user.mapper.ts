@@ -7,6 +7,7 @@ export function userToDomain(userEntity: UserEntity): User {
     email: userEntity.email,
     name: userEntity.name,
     createdAt: userEntity.createdAt,
+    deletedAt: userEntity.deletedAt,
   });
 }
 
@@ -16,5 +17,6 @@ export function userToEntity(user: User): UserEntity {
     email: user.email,
     name: user.name,
     createdAt: user.createdAt,
+    deletedAt: user.deletedAt,
   };
 }
