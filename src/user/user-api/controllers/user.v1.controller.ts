@@ -4,7 +4,7 @@ import {
   Get,
   HttpStatus,
   Inject,
-  Patch,
+  Put,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -69,10 +69,13 @@ export class UserV1Controller {
     };
   }
 
-  @Patch('/me')
+  @Put('/me')
+  @ApiOperation({
+    summary: '해당 사용자 정보를 업데이트 합니다.',
+  })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: '정보 조회 성공',
+    description: '정보 업데이트 성공',
     type: UserMeResponseDto,
   })
   @ApiResponse({

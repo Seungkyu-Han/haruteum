@@ -21,8 +21,8 @@ export class UserCommandServiceImpl implements IUserCommandService {
 
     if (!user) throw new UserNotFoundException();
 
-    user.name = name ?? user.name;
-    user.email = email ?? user.email;
+    user.name = name;
+    user.email = email;
 
     return await this.userRepository.save(user);
   }

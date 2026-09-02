@@ -39,6 +39,6 @@ import { UserCommandServiceImpl } from './services/user-command.service.impl';
     },
     KakaoOauthService,
   ],
-  exports: [AUTH_SERVICE, USER_QUERY_SERVICE],
+  exports: [AUTH_SERVICE, USER_QUERY_SERVICE, USER_COMMAND_SERVICE],
 })
 export class UserApplicationModule {}
