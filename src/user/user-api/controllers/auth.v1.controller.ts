@@ -1,4 +1,12 @@
-import { Controller, Get, Inject, Query, Req, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  Inject,
+  Query,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import type { IAuthService } from '../../user-core/input/services/auth.service';
 import { AUTH_SERVICE } from '../../user-core/user.token';
 import { TokenResponseDto } from '../dto/response/token.response.dto';
@@ -66,5 +74,11 @@ export class AuthV1Controller {
       accessToken,
       refreshToken,
     };
+  }
+
+  @Delete()
+  @ApiBearerAuth('jwt')
+  async withdrawApi(@Authentication() principal: Principal) {
+    await this.authService.withdraw(principal.id);
   }
 }
