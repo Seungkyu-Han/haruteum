@@ -8,4 +8,5 @@ export interface IAuthService {
   ): Promise<JwtTokenSchema>;
   reissue(token: string): Promise<JwtTokenSchema>;
   withdraw(userId: string): Promise<void>;
+  restoreUser(userId: string): Promise<void>;
 }

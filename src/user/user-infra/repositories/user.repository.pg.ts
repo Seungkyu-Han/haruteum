@@ -32,4 +32,8 @@ export class UserRepositoryPg implements IUserRepository {
   async deleteById(id: string): Promise<void> {
     await this.userRepository.softDelete(id);
   }
+
+  async restore(id: string): Promise<void> {
+    await this.userRepository.restore(id);
+  }
 }
