@@ -1,5 +1,5 @@
 import { User } from '../../user';
 
-export interface UserQueryService {
-  userInfoById(id: string): Promise<User>;
+export interface IUserQueryService {
+  userInfoById(userId: string): Promise<User>;
 }
