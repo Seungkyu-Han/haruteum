@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config';
 import { JwtTokenSchema } from '../../user-core/schema/jwt-token.schema';
 import { JwtTokenGenerator, Principal } from '@seungkyu/guardian';
 import { JwtService } from '@nestjs/jwt';
+import { WithdrawUserException } from '../../user-core/exceptions/withdraw-user.exception';
 
 export class AuthServiceImpl implements IAuthService {
   private readonly jwtSecret: string;
@@ -110,7 +111,9 @@ export class AuthServiceImpl implements IAuthService {
   }
 
   private async createUserIfNotExists(id: string): Promise<User> {
-    let user = await this.userRepository.findById(id);
+    let user = await this.userRepository.findByIdWithDeleted(id);
+
+    if (user?.isDeleted()) throw new WithdrawUserException();
 
     if (!user) {
       user = new User({
