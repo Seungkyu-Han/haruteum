@@ -1,12 +1,17 @@
 import { HttpModule } from '@nestjs/axios';
 import { Module } from '@nestjs/common';
 import { UserInfraModule } from '../user-infra/user-infra.module';
-import { AUTH_SERVICE, USER_QUERY_SERVICE } from '../user-core/user.token';
+import {
+  AUTH_SERVICE,
+  USER_COMMAND_SERVICE,
+  USER_QUERY_SERVICE,
+} from '../user-core/user.token';
 import { AuthServiceImpl } from './services/auth.service.impl';
 import { KakaoOauthService } from './services/oauth/kakao/kakao.oauth.service';
 import { JwtModule } from '@nestjs/jwt';
 import { GuardianModule } from '@seungkyu/guardian';
 import { UserQueryServiceImpl } from './services/user-query.service.impl';
+import { UserCommandServiceImpl } from './services/user-command.service.impl';
 
 @Module({
   imports: [
@@ -27,6 +32,10 @@ import { UserQueryServiceImpl } from './services/user-query.service.impl';
     {
       provide: USER_QUERY_SERVICE,
       useClass: UserQueryServiceImpl,
+    },
+    {
+      provide: USER_COMMAND_SERVICE,
+      useClass: UserCommandServiceImpl,
     },
     KakaoOauthService,
   ],
