@@ -2,6 +2,7 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
   HttpStatus,
   Inject,
   Query,
@@ -124,8 +125,16 @@ export class AuthV1Controller {
     };
   }
 
-  @Delete()
+  @Delete('me')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBearerAuth('jwt')
+  @ApiOperation({
+    summary: '해당 사용자를 탈퇴처리합니다.',
+  })
+  @ApiResponse({
+    status: HttpStatus.NO_CONTENT,
+    description: '탈퇴 성공했습니다.',
+  })
   async withdrawApi(@Authentication() principal: Principal) {
     await this.authService.withdraw(principal.id);
   }
