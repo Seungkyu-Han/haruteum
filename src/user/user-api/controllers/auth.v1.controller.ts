@@ -18,6 +18,7 @@ import {
   ApiOperation,
   ApiQuery,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 import type { Request } from 'express';
 import {
@@ -27,6 +28,7 @@ import {
   Public,
 } from '@seungkyu/guardian';
 
+@ApiTags('인증 API')
 @Controller({ path: 'auth', version: '1' })
 export class AuthV1Controller {
   constructor(
