@@ -3,7 +3,9 @@ import { Memory } from '../../memory';
 export interface IMemoryRepository {
   save(memory: Memory): Promise<Memory>;
   findById(id: string): Promise<Memory | null>;
+  findByIdIn(id: string[]): Promise<Memory[]>;
   deleteById(id: string): Promise<void>;
+  deleteByIdIn(id: string[]): Promise<void>;
   findByUserId(
     userId: string,
     pageSize?: number,
