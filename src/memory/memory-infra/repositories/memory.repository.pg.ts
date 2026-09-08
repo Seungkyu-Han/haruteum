@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { IMemoryRepository } from '../../memory-core/output/repositories/memory.repository';
 import { InjectRepository } from '@nestjs/typeorm';
 import { MemoryEntity } from '../entities/memory.entity';
-import { Between, Repository, LessThan } from 'typeorm';
+import { Between, Repository, LessThan, In } from 'typeorm';
 import { Memory } from '../../memory-core/memory';
 import { memoryToEntity, memoryToDomain } from '../mappers/memory.mapper';
 
@@ -37,8 +37,28 @@ export class MemoryRepositoryPg implements IMemoryRepository {
     return memoryToDomain(memoryEntity);
   }
 
+  async findByIdIn(id: string[]): Promise<Memory[]> {
+    const memoryEntities = await this.memoryRepository.find({
+      where: {
+        id: In(id),
+      },
+      relations: {
+        memoryCommentEntities: true,
+        memoryImageEntities: true,
+      },
+    });
+
+    return memoryEntities.map(memoryToDomain);
+  }
+
   async deleteById(id: string): Promise<void> {
     await this.memoryRepository.delete(id);
+  }
+
+  async deleteByIdIn(id: string[]): Promise<void> {
+    await this.memoryRepository.delete({
+      id: In(id),
+    });
   }
 
   async findByUserId(

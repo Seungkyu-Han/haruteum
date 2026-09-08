@@ -18,4 +18,6 @@ export interface MemoryCommandService {
   ): Promise<Memory[]>;
 
   deleteMemory(memoryId: string, userId?: string): Promise<void>;
+
+  deleteMemories(memoryIds: string[], userId: string): Promise<void>;
 }
