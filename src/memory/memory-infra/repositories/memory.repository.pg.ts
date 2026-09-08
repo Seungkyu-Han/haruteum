@@ -42,6 +42,10 @@ export class MemoryRepositoryPg implements IMemoryRepository {
       where: {
         id: In(id),
       },
+      relations: {
+        memoryCommentEntities: true,
+        memoryImageEntities: true,
+      },
     });
 
     return memoryEntities.map(memoryToDomain);
