@@ -255,16 +255,6 @@ export class MemoryController {
   ): Promise<void> {
     const idArray = Array.isArray(memoryIds) ? memoryIds : [memoryIds];
 
-    const uuidRegex =
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-    const invalidUuid = idArray.find((id) => !uuidRegex.test(id));
-    if (invalidUuid) {
-      throw new BadRequestException(
-        `올바르지 않은 UUID 형식입니다: ${invalidUuid}`,
-      );
-    }
-
     await this.memoryCommandService.deleteMemories(idArray, principal.id);
   }
 
