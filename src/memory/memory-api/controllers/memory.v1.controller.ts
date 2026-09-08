@@ -223,14 +223,14 @@ export class MemoryController {
     return this.memoryToDto(memory);
   }
 
-  @Delete('/:memoryIds')
+  @Delete('')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBearerAuth('jwt')
   @ApiProduces('application/json')
   @ApiQuery({
     name: 'memoryIds',
     required: true,
-    type: String,
+    type: [String],
     description: '삭제할 memoryId 목록 (예: 1,2,3)',
     example: '1,2,3',
   })
@@ -243,11 +243,29 @@ export class MemoryController {
     description: 'description',
   })
   async deleteMemoryApi(
-    @Query('memoryIds', new ParseArrayPipe({ items: String, separator: ',' }))
-    memoryIds: string[],
+    @Query(
+      'memoryIds',
+      new ParseArrayPipe({
+        items: String,
+        optional: false,
+      }),
+    )
+    memoryIds: string | string[],
     @Authentication() principal: Principal,
-  ): Promise<undefined> {
-    await this.memoryCommandService.deleteMemories(memoryIds, principal.id);
+  ): Promise<void> {
+    const idArray = Array.isArray(memoryIds) ? memoryIds : [memoryIds];
+
+    const uuidRegex =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+    const invalidUuid = idArray.find((id) => !uuidRegex.test(id));
+    if (invalidUuid) {
+      throw new BadRequestException(
+        `올바르지 않은 UUID 형식입니다: ${invalidUuid}`,
+      );
+    }
+
+    await this.memoryCommandService.deleteMemories(idArray, principal.id);
   }
 
   private memoryToDto(memory: Memory): MemoryResponseDto {
