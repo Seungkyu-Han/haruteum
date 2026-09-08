@@ -14,6 +14,7 @@ import {
   HttpCode,
   Query,
   BadRequestException,
+  ParseArrayPipe,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -222,11 +223,17 @@ export class MemoryController {
     return this.memoryToDto(memory);
   }
 
-  @Delete('/:memoryId')
-  @Public()
+  @Delete('/:memoryIds')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiBearerAuth('jwt')
   @ApiProduces('application/json')
+  @ApiQuery({
+    name: 'memoryIds',
+    required: true,
+    type: String,
+    description: '삭제할 memoryId 목록 (예: 1,2,3)',
+    example: '1,2,3',
+  })
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: '추억 삭제 성공',
@@ -236,10 +243,11 @@ export class MemoryController {
     description: 'description',
   })
   async deleteMemoryApi(
-    @Param('memoryId') memoryId: string,
-    @Authentication() principal?: Principal,
+    @Query('memoryIds', new ParseArrayPipe({ items: String, separator: ',' }))
+    memoryIds: string[],
+    @Authentication() principal: Principal,
   ): Promise<undefined> {
-    await this.memoryCommandService.deleteMemory(memoryId, principal?.id);
+    await this.memoryCommandService.deleteMemories(memoryIds, principal.id);
   }
 
   private memoryToDto(memory: Memory): MemoryResponseDto {
