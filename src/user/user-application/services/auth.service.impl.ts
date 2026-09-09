@@ -1,7 +1,7 @@
 import { Inject } from '@nestjs/common';
 import { IAuthService } from '../../user-core/input/services/auth.service';
 import type { IUserRepository } from '../../user-core/output/user.repository';
-import { USER_REPOSITORY } from '../../user-core/user.token';
+import { NAME_GENERATOR, USER_REPOSITORY } from '../../user-core/user.token';
 import { KakaoOauthService } from './oauth/kakao/kakao.oauth.service';
 import { User } from '../../user-core/user';
 import { ConfigService } from '@nestjs/config';
@@ -9,6 +9,7 @@ import { JwtTokenSchema } from '../../user-core/schema/jwt-token.schema';
 import { JwtTokenGenerator, Principal } from '@seungkyu/guardian';
 import { JwtService } from '@nestjs/jwt';
 import { TokenExpiredException } from '../../user-core/exceptions/token-expired.exception';
+import type { INameGenerator } from '../../user-core/output/name.generator';
 
 export class AuthServiceImpl implements IAuthService {
   private readonly jwtSecret: string;
@@ -16,6 +17,8 @@ export class AuthServiceImpl implements IAuthService {
   constructor(
     @Inject(USER_REPOSITORY)
     private readonly userRepository: IUserRepository,
+    @Inject(NAME_GENERATOR)
+    private readonly nameGenerator: INameGenerator,
     private readonly kakaoOauthService: KakaoOauthService,
     private readonly configService: ConfigService,
     private readonly jwtTokenGenerator: JwtTokenGenerator,
@@ -129,9 +132,12 @@ export class AuthServiceImpl implements IAuthService {
   private async createUserIfNotExists(id: string): Promise<User> {
     let user = await this.userRepository.findByIdWithDeleted(id);
 
+    const name = await this.nameGenerator.generateName();
+
     if (!user) {
       user = new User({
         id,
+        nickname: name,
       });
       await this.userRepository.save(user);
     }
