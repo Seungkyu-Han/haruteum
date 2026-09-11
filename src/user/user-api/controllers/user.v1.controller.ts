@@ -65,7 +65,6 @@ export class UserV1Controller {
 
     return {
       nickname: user.nickname,
-      email: user.email,
     };
   }
 
@@ -93,12 +92,10 @@ export class UserV1Controller {
     const user = await this.userCommandService.updateUserInfo(
       principal.id,
       userMeRequestDto.nickname,
-      userMeRequestDto.email,
     );
 
     return {
       nickname: user.nickname,
-      email: user.email,
     };
   }
 }

@@ -6,9 +6,6 @@ export class UserEntity {
   id: string;
 
   @Column({ type: 'text', nullable: true })
-  email?: string;
-
-  @Column({ type: 'text', nullable: true })
   nickname?: string;
 
   @Column({ type: 'timestamp' })
