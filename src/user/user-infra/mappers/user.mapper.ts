@@ -17,6 +17,6 @@ export function userToEntity(user: User): UserEntity {
     email: user.email,
     nickname: user.nickname,
     createdAt: user.createdAt,
-    deletedAt: user.deletedAt,
-  };
+    deletedAt: user.deletedAt ?? null,
+  } as UserEntity;
 }
