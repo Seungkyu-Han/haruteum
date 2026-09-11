@@ -2,14 +2,12 @@ import { randomUUID } from 'crypto';
 
 export class User {
   private readonly _id: string;
-  private _email: string | undefined;
   private _nickname: string | undefined;
   private readonly _createdAt: Date;
   private _deletedAt: Date | undefined;
 
   constructor({
     id,
-    email,
     nickname,
     createdAt,
     deletedAt,
@@ -21,7 +19,6 @@ export class User {
     deletedAt?: Date;
   }) {
     this._id = id || randomUUID();
-    this._email = email;
     this._nickname = nickname;
     this._createdAt = createdAt || new Date();
     this._deletedAt = deletedAt;
@@ -29,10 +26,6 @@ export class User {
 
   get id() {
     return this._id;
-  }
-
-  get email(): string | undefined {
-    return this._email;
   }
 
   get nickname(): string | undefined {
@@ -49,10 +42,6 @@ export class User {
 
   set nickname(nickname: string | undefined) {
     this._nickname = nickname;
-  }
-
-  set email(email: string | undefined) {
-    this._email = email;
   }
 
   isDeleted() {

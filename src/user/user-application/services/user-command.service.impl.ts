@@ -12,17 +12,12 @@ export class UserCommandServiceImpl implements IUserCommandService {
     private readonly userRepository: IUserRepository,
   ) {}
 
-  async updateUserInfo(
-    userId: string,
-    nickname?: string,
-    email?: string,
-  ): Promise<User> {
+  async updateUserInfo(userId: string, nickname?: string): Promise<User> {
     const user: User | null = await this.userRepository.findById(userId);
 
     if (!user) throw new UserNotFoundException();
 
     user.nickname = nickname;
-    user.email = email;
 
     return await this.userRepository.save(user);
   }
