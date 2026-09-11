@@ -5,7 +5,7 @@ export class User {
   private _email: string | undefined;
   private _nickname: string | undefined;
   private readonly _createdAt: Date;
-  private readonly _deletedAt: Date | undefined;
+  private _deletedAt: Date | undefined;
 
   constructor({
     id,
@@ -57,5 +57,15 @@ export class User {
 
   isDeleted() {
     return !!this._deletedAt;
+  }
+
+  withdraw() {
+    this._deletedAt = new Date();
+    this._nickname = undefined;
+  }
+
+  restore(nickname: string) {
+    this._nickname = nickname;
+    this._deletedAt = undefined;
   }
 }

@@ -10,6 +10,7 @@ import { JwtTokenGenerator, Principal } from '@seungkyu/guardian';
 import { JwtService } from '@nestjs/jwt';
 import { TokenExpiredException } from '../../user-core/exceptions/token-expired.exception';
 import type { INameGenerator } from '../../user-core/output/name.generator';
+import { UserNotFoundException } from '../../user-core/exceptions/user-not-found.exception';
 
 export class AuthServiceImpl implements IAuthService {
   private readonly jwtSecret: string;
@@ -146,11 +147,29 @@ export class AuthServiceImpl implements IAuthService {
   }
 
   async withdraw(userId: string): Promise<void> {
+    const user: User | null = await this.userRepository.findById(userId);
+
+    if (user === null) throw new UserNotFoundException();
+
+    user.withdraw();
+
     await this.kakaoOauthService.unlink(userId);
-    await this.userRepository.deleteById(userId);
+
+    await this.userRepository.save(user);
   }
 
   async restoreUser(userId: string): Promise<void> {
+    const user: User | null =
+      await this.userRepository.findByIdWithDeleted(userId);
+
+    if (user === null) throw new UserNotFoundException();
+
+    const nickname = await this.nameGenerator.generateName();
+
+    user.restore(nickname);
+
+    await this.userRepository.save(user);
+
     await this.userRepository.restore(userId);
   }
 }
