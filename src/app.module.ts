@@ -4,6 +4,7 @@ import { MemoryModule } from './memory/memory.module';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path/posix';
 import { UserModule } from './user/user.module';
+import { CoupleModule } from './couple/couple.module';
 import { CommonModule } from './common/common.module';
 import { ConfigModule as ConfigModuleLib } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
@@ -21,6 +22,7 @@ import { JwtModule } from '@nestjs/jwt';
       serveRoot: '/uploads',
     }),
     UserModule,
+    CoupleModule,
     CommonModule,
   ],
   controllers: [],
