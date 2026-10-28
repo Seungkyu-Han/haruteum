@@ -1,18 +1,69 @@
-import { Agent, AgentInputItem, run } from '@openai/agents';
+import {
+  Agent,
+  AgentInputItem,
+  run,
+  OpenAIChatCompletionsModel,
+  setDefaultOpenAIKey,
+} from '@openai/agents';
+import OpenAI from 'openai';
+import { Injectable, Logger, Optional } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { ImageMoodAgent } from '../../memory-core/output/agents/image-mood.agent';
 import { ImageMoodResultSchema } from '../schemas/image_mood_agent_schema';
-import { Injectable } from '@nestjs/common';
 import { MemoryComment } from '../../memory-core/memory-comment';
 import { ImageMoodAgentModel } from '../../memory-core/models/image-mood-agent.model';
 
 @Injectable()
 export class OpenAIImageMoodAgent implements ImageMoodAgent {
+  private readonly logger = new Logger(OpenAIImageMoodAgent.name);
   private readonly imageMoodAgent: Agent<unknown, typeof ImageMoodResultSchema>;
 
-  constructor() {
+  constructor(
+    @Optional()
+    private readonly configService?: ConfigService,
+  ) {
+    const baseUrl =
+      this.configService?.get<string>('BASE_URL') ??
+      this.configService?.get<string>('OPENAI_BASE_URL') ??
+      process.env.BASE_URL ??
+      process.env.OPENAI_BASE_URL;
+
+    const modelName =
+      this.configService?.get<string>('MODEL') ??
+      this.configService?.get<string>('OPENAI_MODEL') ??
+      process.env.MODEL ??
+      process.env.OPENAI_MODEL ??
+      'gpt-4.1-mini-2025-04-14';
+
+    const apiKey =
+      this.configService?.get<string>('API_KEY') ??
+      this.configService?.get<string>('OPENAI_API_KEY') ??
+      process.env.API_KEY ??
+      process.env.OPENAI_API_KEY;
+
+    let model: string | OpenAIChatCompletionsModel = modelName;
+
+    if (baseUrl) {
+      this.logger.log(
+        `Connecting OpenAIImageMoodAgent to custom BASE_URL: ${baseUrl} with model: ${modelName}`,
+      );
+      const client = new OpenAI({
+        baseURL: baseUrl,
+        apiKey: apiKey ?? 'dummy-api-key',
+      });
+      model = new OpenAIChatCompletionsModel(client, modelName);
+    } else {
+      this.logger.log(
+        `Connecting OpenAIImageMoodAgent with default OpenAI endpoint and model: ${modelName}`,
+      );
+      if (apiKey) {
+        setDefaultOpenAIKey(apiKey);
+      }
+    }
+
     this.imageMoodAgent = new Agent({
       name: 'image mood agent',
-      model: 'gpt-4.1-mini-2025-04-14',
+      model,
       instructions: `
 # 역할 및 정체성
 당신은 연인들의 소중한 순간과 추억을 감성적으로 기록해주는 커플 다이어리 서비스 '하루틈'의 AI 에디터입니다.

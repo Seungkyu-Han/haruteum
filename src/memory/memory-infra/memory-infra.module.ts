@@ -40,7 +40,7 @@ import { GcpMemoryImageStorage } from './storages/gcp-memory-image.storage';
 
         switch (imageMoodAgentType) {
           case 'openai':
-            return new OpenAIImageMoodAgent();
+            return new OpenAIImageMoodAgent(configService);
           default:
             return new MockImageMoodAgent();
         }
