@@ -3,8 +3,8 @@ import { ApiProperty, ApiSchema } from '@nestjs/swagger';
 @ApiSchema({ name: '커플 초대 코드 응답 DTO' })
 export class InviteCodeResponseDto {
   @ApiProperty({
-    description: '생성된 6자리 커플 초대 코드',
-    example: 'A7K9PQ',
+    description: '생성된 커플 초대 코드',
+    example: 'LOVEA7K9PQ',
   })
   code: string;
 
