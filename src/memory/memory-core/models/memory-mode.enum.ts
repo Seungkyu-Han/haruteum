@@ -8,3 +8,4 @@ export function isCoupleMemoryMode(mode?: string): boolean {
   const normalized = mode.trim().toUpperCase();
   return normalized === MemoryMode.COUPLE || normalized === 'SHARED';
 }
+
