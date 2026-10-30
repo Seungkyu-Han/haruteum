@@ -5,8 +5,8 @@ import {
   Get,
   HttpStatus,
   Inject,
-  NotFoundException,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -30,6 +30,7 @@ import type { ICoupleQueryService } from '../../couple-core/input/services/coupl
 import { USER_QUERY_SERVICE } from '../../../user/user-core/user.token';
 import type { IUserQueryService } from '../../../user/user-core/input/services/user-query.service';
 import { ConnectCoupleRequestDto } from '../dto/request/connect-couple.request.dto';
+import { CheckInviteCodeRequestDto } from '../dto/request/check-invite-code.request.dto';
 import { InviteCodeResponseDto } from '../dto/response/invite-code.response.dto';
 import { CoupleInfoResponseDto } from '../dto/response/couple-info.response.dto';
 import { AlreadyInCoupleException } from '../../couple-core/exceptions/already-in-couple.exception';
@@ -86,26 +87,54 @@ export class CoupleV1Controller {
 
   @Get('/invite-code')
   @ApiOperation({
-    summary: '현재 발급되어 있는 유효한 커플 초대 코드를 조회합니다.',
+    summary: '커플 초대 코드의 유효성을 검증합니다.',
+    description: '입력받은 초대 코드가 현재 유효한지 체크합니다.',
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: '유효한 초대 코드 조회 성공',
+    description: '유효한 초대 코드 검증 성공',
     type: InviteCodeResponseDto,
   })
   @ApiResponse({
-    status: HttpStatus.NOT_FOUND,
-    description: '유효한 초대 코드가 존재하지 않습니다.',
+    status: HttpStatus.BAD_REQUEST,
+    description: '유효하지 않은 코드이거나 본인 코드입니다.',
   })
-  async getInviteCode(
+  @ApiResponse({
+    status: HttpStatus.GONE,
+    description: '초대 코드가 만료되었습니다.',
+  })
+  @ApiResponse({
+    status: HttpStatus.CONFLICT,
+    description: '이미 사용된 코드이거나 이미 커플 상태입니다.',
+  })
+  @MapError({
+    sourceError: InvalidCoupleCodeException,
+    status: HttpStatus.BAD_REQUEST,
+  })
+  @MapError({
+    sourceError: CannotCoupleWithSelfException,
+    status: HttpStatus.BAD_REQUEST,
+  })
+  @MapError({
+    sourceError: CoupleCodeExpiredException,
+    status: HttpStatus.GONE,
+  })
+  @MapError({
+    sourceError: CoupleCodeAlreadyUsedException,
+    status: HttpStatus.CONFLICT,
+  })
+  @MapError({
+    sourceError: AlreadyInCoupleException,
+    status: HttpStatus.CONFLICT,
+  })
+  async validateInviteCode(
     @Authentication() principal: Principal,
+    @Query() query: CheckInviteCodeRequestDto,
   ): Promise<InviteCodeResponseDto> {
-    const inviteCode = await this.coupleQueryService.getValidInviteCode(
+    const inviteCode = await this.coupleQueryService.validateInviteCode(
       principal.id,
+      query.code,
     );
-    if (!inviteCode) {
-      throw new NotFoundException('유효한 초대 코드가 존재하지 않습니다.');
-    }
     return {
       code: inviteCode.code,
       expiresAt: inviteCode.expiresAt,
