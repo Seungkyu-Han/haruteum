@@ -4,5 +4,6 @@ export interface ImageMoodAgent {
   invoke(
     memoryImageBuffers: Buffer[],
     memoryComments: MemoryComment[],
+    mode?: string,
   ): Promise<ImageMoodAgentModel>;
 }

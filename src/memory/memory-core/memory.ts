@@ -56,6 +56,7 @@ export class Memory {
     const imageMoodAgentModel = await imageMoodAgent.invoke(
       memoryImageBuffers,
       this._memoryComments,
+      this._mode,
     );
 
     this._summary = imageMoodAgentModel.summary;

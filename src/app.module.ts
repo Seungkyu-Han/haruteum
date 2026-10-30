@@ -5,6 +5,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path/posix';
 import { UserModule } from './user/user.module';
 import { CoupleModule } from './couple/couple.module';
+import { CalendarModule } from './calendar/calendar.module';
 import { CommonModule } from './common/common.module';
 import { ConfigModule as ConfigModuleLib } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
@@ -23,6 +24,7 @@ import { JwtModule } from '@nestjs/jwt';
     }),
     UserModule,
     CoupleModule,
+    CalendarModule,
     CommonModule,
   ],
   controllers: [],
