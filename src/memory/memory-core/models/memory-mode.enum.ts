@@ -1,11 +1,15 @@
 export enum MemoryMode {
-  COUPLE = 'COUPLE',
-  PERSONAL = 'PERSONAL',
+  TOGETHER = 'TOGETHER',
+  SOLO = 'SOLO',
 }
 
 export function isCoupleMemoryMode(mode?: string): boolean {
   if (!mode) return false;
   const normalized = mode.trim().toUpperCase();
-  return normalized === MemoryMode.COUPLE || normalized === 'SHARED';
+  return (
+    normalized === MemoryMode.TOGETHER ||
+    normalized === 'COUPLE' ||
+    normalized === 'SHARED'
+  );
 }
 

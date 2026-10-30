@@ -23,8 +23,9 @@ export class CreateMemoryRequestDto {
   })
   emotion: string;
   @ApiProperty({
-    description: '추억 모드 (COUPLE: 연인과 공유하는 커플 추억, PERSONAL: 개인 일반 추억)',
-    example: 'COUPLE',
+    description:
+      '추억 모드 (TOGETHER: 연인과 공유하는 커플 추억, SOLO: 개인 일반 추억)',
+    example: 'TOGETHER',
   })
   mode: string;
 }
