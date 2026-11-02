@@ -39,6 +39,7 @@ import { CoupleCodeExpiredException } from '../../couple-core/exceptions/couple-
 import { CoupleCodeAlreadyUsedException } from '../../couple-core/exceptions/couple-code-already-used.exception';
 import { CannotCoupleWithSelfException } from '../../couple-core/exceptions/cannot-couple-with-self.exception';
 import { CoupleNotFoundException } from '../../couple-core/exceptions/couple-not-found.exception';
+import { CoupleCodeGenerationFailedException } from '../../couple-core/exceptions/couple-code-generation-failed.exception';
 
 @ApiTags('커플 API')
 @Controller({ path: 'couple', version: '1' })
@@ -69,9 +70,17 @@ export class CoupleV1Controller {
     status: HttpStatus.CONFLICT,
     description: '이미 다른 사용자와 커플로 연결되어 있습니다.',
   })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: '초대 코드 생성에 실패했습니다.',
+  })
   @MapError({
     sourceError: AlreadyInCoupleException,
     status: HttpStatus.CONFLICT,
+  })
+  @MapError({
+    sourceError: CoupleCodeGenerationFailedException,
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
   })
   async generateInviteCode(
     @Authentication() principal: Principal,
