@@ -5,7 +5,6 @@ import {
   HttpCode,
   HttpStatus,
   Inject,
-  NotFoundException,
   Post,
   Query,
   Req,
@@ -30,6 +29,8 @@ import {
 } from '@seungkyu/guardian';
 import { MapError } from '@seungkyu/error-mapper';
 import { TokenExpiredException } from '../../user-core/exceptions/token-expired.exception';
+import { InvalidTokenException } from '../../user-core/exceptions/invalid-token.exception';
+import { OAuthFailedException } from '../../user-core/exceptions/oauth-failed.exception';
 import { KakaoOauthNotFoundException } from '../../user-core/exceptions/kakao-oauth-not-found.exception';
 import { UserNotFoundException } from '../../user-core/exceptions/user-not-found.exception';
 
@@ -57,6 +58,14 @@ export class AuthV1Controller {
     description: '로그인 성공',
     type: TokenResponseDto,
   })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: '유효하지 않은 인가 코드이거나 카카오 인증에 실패했습니다.',
+  })
+  @MapError({
+    sourceError: OAuthFailedException,
+    status: HttpStatus.BAD_REQUEST,
+  })
   async kakaoLoginCodeApi(
     @Query('code') code: string,
   ): Promise<TokenResponseDto> {
@@ -79,6 +88,14 @@ export class AuthV1Controller {
     status: HttpStatus.OK,
     description: '로그인 성공',
     type: TokenResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.BAD_REQUEST,
+    description: '유효하지 않은 토큰이거나 카카오 인증에 실패했습니다.',
+  })
+  @MapError({
+    sourceError: OAuthFailedException,
+    status: HttpStatus.BAD_REQUEST,
   })
   async kakaoLoginTokenApi(@Req() req: Request): Promise<TokenResponseDto> {
     const authorization = req.headers.authorization ?? '';
@@ -106,16 +123,21 @@ export class AuthV1Controller {
   @Get('reissue')
   @ApiBearerAuth('jwt')
   @ApiResponse({
-    status: HttpStatus.NO_CONTENT,
-    description: '토큰 생성에 성공했습니다',
+    status: HttpStatus.OK,
+    description: '토큰 재발급에 성공했습니다',
+    type: TokenResponseDto,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
-    description: '해당 토큰이 만료되었습니다.',
+    description: '해당 토큰이 만료되었거나 유효하지 않습니다.',
   })
   @MapError({
     sourceError: TokenExpiredException,
-    status: 401,
+    status: HttpStatus.UNAUTHORIZED,
+  })
+  @MapError({
+    sourceError: InvalidTokenException,
+    status: HttpStatus.UNAUTHORIZED,
   })
   async reissueApi(@Req() req: Request): Promise<TokenResponseDto> {
     const authorization = req.headers.authorization ?? '';
@@ -143,7 +165,7 @@ export class AuthV1Controller {
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
-    description: '해당 사용자의 카카오 정보를 찾을 수 없습니다.',
+    description: '해당 사용자 또는 카카오 연동 정보를 찾을 수 없습니다.',
   })
   @MapError({
     sourceError: UserNotFoundException,
@@ -154,11 +176,7 @@ export class AuthV1Controller {
     status: HttpStatus.NOT_FOUND,
   })
   async withdrawApi(@Authentication() principal: Principal) {
-    try {
-      await this.authService.withdraw(principal.id);
-    } catch (e) {
-      throw new NotFoundException(e);
-    }
+    await this.authService.withdraw(principal.id);
   }
 
   @Post('me/restore')
@@ -171,6 +189,10 @@ export class AuthV1Controller {
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: '복구 성공했습니다.',
+  })
+  @ApiResponse({
+    status: HttpStatus.NOT_FOUND,
+    description: '복구할 사용자를 찾을 수 없습니다.',
   })
   @MapError({
     sourceError: UserNotFoundException,

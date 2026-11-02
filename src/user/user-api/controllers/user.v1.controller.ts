@@ -51,6 +51,10 @@ export class UserV1Controller {
     type: UserMeResponseDto,
   })
   @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: '인증되지 않은 사용자입니다.',
+  })
+  @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: '해당 사용자가 존재하지 않습니다.',
   })
@@ -76,6 +80,10 @@ export class UserV1Controller {
     status: HttpStatus.OK,
     description: '정보 업데이트 성공',
     type: UserMeResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: '인증되지 않은 사용자입니다.',
   })
   @ApiResponse({
     status: HttpStatus.NOT_FOUND,
