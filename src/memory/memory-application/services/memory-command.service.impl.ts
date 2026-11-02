@@ -15,6 +15,10 @@ import type { IMemoryRepository } from '../../memory-core/output/repositories/me
 import type { MemoryImageStorage } from '../../memory-core/output/storages/memory-image.storage';
 import { MemoryNotFoundException } from '../exceptions/memory-not-found.exception';
 import { MemoryUserMismatchException } from '../exceptions/memory-user-mismatch.exception';
+import { InvalidMemoryDateRangeException } from '../exceptions/invalid-memory-date-range.exception';
+import { EmptyMemoryImagesException } from '../exceptions/empty-memory-images.exception';
+import { InvalidMemoryModeException } from '../exceptions/invalid-memory-mode.exception';
+import { MemoryMode } from '../../memory-core/models/memory-mode.enum';
 
 @Injectable()
 export class MemoryCommandServiceImpl implements MemoryCommandService {
@@ -51,6 +55,14 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
     start?: Date,
     end?: Date,
   ): Promise<Memory[]> {
+    if ((start && end === undefined) || (start === undefined && end)) {
+      throw new InvalidMemoryDateRangeException();
+    }
+
+    if (start && end && new Date(start).getTime() > new Date(end).getTime()) {
+      throw new InvalidMemoryDateRangeException();
+    }
+
     let modifiedStart: Date | undefined;
     let modifiedEnd: Date | undefined;
 
@@ -92,6 +104,21 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
     createMemoryCommand: CreateMemoryCommand,
     userId?: string,
   ): Promise<Memory> {
+    if (
+      !createMemoryCommand.imageCommands ||
+      createMemoryCommand.imageCommands.length === 0
+    ) {
+      throw new EmptyMemoryImagesException();
+    }
+
+    const normalizedMode = createMemoryCommand.mode?.trim().toUpperCase();
+    if (
+      normalizedMode !== MemoryMode.TOGETHER &&
+      normalizedMode !== MemoryMode.SOLO
+    ) {
+      throw new InvalidMemoryModeException();
+    }
+
     const memoryId: string = randomUUID();
 
     const memoryImages = await Promise.all(
