@@ -10,4 +10,3 @@ export interface ICalendarScheduleRepository {
   ): Promise<CalendarSchedule[]>;
   deleteById(id: string): Promise<void>;
 }
-

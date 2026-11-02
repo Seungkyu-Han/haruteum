@@ -69,6 +69,10 @@ export class CalendarV1Controller {
     description: '날짜 범위가 올바르지 않습니다.',
   })
   @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: '인증되지 않은 사용자입니다.',
+  })
+  @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: '커플로 연결되어 있지 않습니다.',
   })
@@ -113,6 +117,10 @@ export class CalendarV1Controller {
     description: '시작일이 종료일보다 이후입니다.',
   })
   @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: '인증되지 않은 사용자입니다.',
+  })
+  @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: '커플로 연결되어 있지 않습니다.',
   })
@@ -133,7 +141,7 @@ export class CalendarV1Controller {
       new Date(query.startDate),
       new Date(query.endDate),
     );
-    return schedules.map(this.toResponseDto);
+    return schedules.map((schedule) => this.toResponseDto(schedule));
   }
 
   @Get(':id')
@@ -148,6 +156,10 @@ export class CalendarV1Controller {
     status: HttpStatus.OK,
     description: '상세 정보 조회 성공',
     type: CalendarScheduleResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: '인증되지 않은 사용자입니다.',
   })
   @ApiResponse({
     status: HttpStatus.FORBIDDEN,
@@ -196,6 +208,10 @@ export class CalendarV1Controller {
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: '날짜 범위가 올바르지 않습니다.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: '인증되지 않은 사용자입니다.',
   })
   @ApiResponse({
     status: HttpStatus.FORBIDDEN,
@@ -254,6 +270,10 @@ export class CalendarV1Controller {
     type: CalendarScheduleResponseDto,
   })
   @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: '인증되지 않은 사용자입니다.',
+  })
+  @ApiResponse({
     status: HttpStatus.FORBIDDEN,
     description: '해당 일정에 대한 접근 권한이 없습니다.',
   })
@@ -296,6 +316,10 @@ export class CalendarV1Controller {
   @ApiResponse({
     status: HttpStatus.NO_CONTENT,
     description: '할 일 / 일정 삭제 성공',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: '인증되지 않은 사용자입니다.',
   })
   @ApiResponse({
     status: HttpStatus.FORBIDDEN,
@@ -341,4 +365,3 @@ export class CalendarV1Controller {
     };
   }
 }
-

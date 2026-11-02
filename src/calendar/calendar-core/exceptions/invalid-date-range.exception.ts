@@ -3,4 +3,3 @@ export class InvalidDateRangeException extends Error {
     super(message);
   }
 }
-

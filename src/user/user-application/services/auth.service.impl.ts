@@ -9,6 +9,8 @@ import { JwtTokenSchema } from '../../user-core/schema/jwt-token.schema';
 import { JwtTokenGenerator, Principal } from '@seungkyu/guardian';
 import { JwtService } from '@nestjs/jwt';
 import { TokenExpiredException } from '../../user-core/exceptions/token-expired.exception';
+import { InvalidTokenException } from '../../user-core/exceptions/invalid-token.exception';
+import { OAuthFailedException } from '../../user-core/exceptions/oauth-failed.exception';
 import type { INameGenerator } from '../../user-core/output/name.generator';
 import { UserNotFoundException } from '../../user-core/exceptions/user-not-found.exception';
 
@@ -39,29 +41,51 @@ export class AuthServiceImpl implements IAuthService {
         throw new TokenExpiredException();
       }
 
-      throw new Error('Invalid token');
+      throw new InvalidTokenException();
     }
   }
 
   async oauthLoginByCode(code: string, type: 'kakao') {
-    const accessToken = await this.requestAccessToken(code, type);
+    try {
+      const accessToken = await this.requestAccessToken(code, type);
 
-    return await this.oauthLoginByAccessToken(accessToken, type);
+      return await this.oauthLoginByAccessToken(accessToken, type);
+    } catch (e: unknown) {
+      if (e instanceof OAuthFailedException) {
+        throw e;
+      }
+      throw new OAuthFailedException(
+        e instanceof Error
+          ? e.message
+          : '카카오 인가 코드를 통한 로그인에 실패했습니다.',
+      );
+    }
   }
 
   async oauthLoginByAccessToken(
     accessToken: string,
     type: 'kakao',
   ): Promise<JwtTokenSchema> {
-    const oauthId = await this.queryUserInfo(accessToken, type);
+    try {
+      const oauthId = await this.queryUserInfo(accessToken, type);
 
-    const user = await this.getUserByOauthId(oauthId, type);
+      const user = await this.getUserByOauthId(oauthId, type);
 
-    let isEnabled = true;
+      let isEnabled = true;
 
-    if (user.isDeleted()) isEnabled = false;
+      if (user.isDeleted()) isEnabled = false;
 
-    return await this.createTokenByUserId(user.id, isEnabled);
+      return await this.createTokenByUserId(user.id, isEnabled);
+    } catch (e: unknown) {
+      if (e instanceof OAuthFailedException) {
+        throw e;
+      }
+      throw new OAuthFailedException(
+        e instanceof Error
+          ? e.message
+          : '카카오 토큰을 통한 로그인에 실패했습니다.',
+      );
+    }
   }
 
   private async requestAccessToken(

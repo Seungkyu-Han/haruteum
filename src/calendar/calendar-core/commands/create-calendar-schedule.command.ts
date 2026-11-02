@@ -7,4 +7,3 @@ export interface CreateCalendarScheduleCommand {
   endDate?: Date;
   isCompleted?: boolean;
 }
-

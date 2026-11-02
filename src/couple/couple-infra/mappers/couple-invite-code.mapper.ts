@@ -24,5 +24,5 @@ export function coupleInviteCodeToEntity(
     expiresAt: domain.expiresAt,
     isUsed: domain.isUsed,
     createdAt: domain.createdAt,
-  } as CoupleInviteCodeEntity;
+  };
 }

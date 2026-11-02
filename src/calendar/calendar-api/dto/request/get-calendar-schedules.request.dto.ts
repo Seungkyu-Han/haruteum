@@ -19,4 +19,3 @@ export class GetCalendarSchedulesRequestDto {
   @IsDateString({}, { message: '올바른 날짜 형식(ISO 8601)이어야 합니다.' })
   endDate: string;
 }
-

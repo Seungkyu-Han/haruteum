@@ -15,4 +15,3 @@ import { CALENDAR_SCHEDULE_REPOSITORY } from '../calendar-core/calendar.token';
   exports: [CALENDAR_SCHEDULE_REPOSITORY],
 })
 export class CalendarInfraModule {}
-

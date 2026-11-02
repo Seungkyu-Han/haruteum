@@ -3,4 +3,3 @@ export class UnauthorizedScheduleAccessException extends Error {
     super(message);
   }
 }
-

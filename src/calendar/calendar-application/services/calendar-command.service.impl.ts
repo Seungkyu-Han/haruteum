@@ -1,8 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ICalendarCommandService } from '../../calendar-core/input/services/calendar-command.service';
-import {
-  CALENDAR_SCHEDULE_REPOSITORY,
-} from '../../calendar-core/calendar.token';
+import { CALENDAR_SCHEDULE_REPOSITORY } from '../../calendar-core/calendar.token';
 import type { ICalendarScheduleRepository } from '../../calendar-core/output/repositories/calendar-schedule.repository';
 import { COUPLE_QUERY_SERVICE } from '../../../couple/couple-core/couple.token';
 import type { ICoupleQueryService } from '../../../couple/couple-core/input/services/couple-query.service';
@@ -120,4 +118,3 @@ export class CalendarCommandServiceImpl implements ICalendarCommandService {
     await this.calendarScheduleRepository.deleteById(scheduleId);
   }
 }
-

@@ -39,6 +39,7 @@ import { CoupleCodeExpiredException } from '../../couple-core/exceptions/couple-
 import { CoupleCodeAlreadyUsedException } from '../../couple-core/exceptions/couple-code-already-used.exception';
 import { CannotCoupleWithSelfException } from '../../couple-core/exceptions/cannot-couple-with-self.exception';
 import { CoupleNotFoundException } from '../../couple-core/exceptions/couple-not-found.exception';
+import { CoupleCodeGenerationFailedException } from '../../couple-core/exceptions/couple-code-generation-failed.exception';
 
 @ApiTags('커플 API')
 @Controller({ path: 'couple', version: '1' })
@@ -66,12 +67,24 @@ export class CoupleV1Controller {
     type: InviteCodeResponseDto,
   })
   @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: '인증되지 않은 사용자입니다.',
+  })
+  @ApiResponse({
     status: HttpStatus.CONFLICT,
     description: '이미 다른 사용자와 커플로 연결되어 있습니다.',
+  })
+  @ApiResponse({
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
+    description: '초대 코드 생성에 실패했습니다.',
   })
   @MapError({
     sourceError: AlreadyInCoupleException,
     status: HttpStatus.CONFLICT,
+  })
+  @MapError({
+    sourceError: CoupleCodeGenerationFailedException,
+    status: HttpStatus.INTERNAL_SERVER_ERROR,
   })
   async generateInviteCode(
     @Authentication() principal: Principal,
@@ -98,6 +111,10 @@ export class CoupleV1Controller {
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: '유효하지 않은 코드이거나 본인 코드입니다.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: '인증되지 않은 사용자입니다.',
   })
   @ApiResponse({
     status: HttpStatus.GONE,
@@ -153,6 +170,10 @@ export class CoupleV1Controller {
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
     description: '유효하지 않은 코드이거나 본인 코드입니다.',
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: '인증되지 않은 사용자입니다.',
   })
   @ApiResponse({
     status: HttpStatus.GONE,
@@ -211,6 +232,10 @@ export class CoupleV1Controller {
     type: CoupleInfoResponseDto,
   })
   @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: '인증되지 않은 사용자입니다.',
+  })
+  @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: '커플로 연결되어 있지 않습니다.',
   })
@@ -242,6 +267,10 @@ export class CoupleV1Controller {
     description: '커플 연결 해제 성공',
   })
   @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: '인증되지 않은 사용자입니다.',
+  })
+  @ApiResponse({
     status: HttpStatus.NOT_FOUND,
     description: '커플로 연결되어 있지 않습니다.',
   })
@@ -255,7 +284,9 @@ export class CoupleV1Controller {
     await this.coupleCommandService.disconnectCouple(principal.id);
   }
 
-  private async fetchPartnerNickname(partnerId: string): Promise<string | undefined> {
+  private async fetchPartnerNickname(
+    partnerId: string,
+  ): Promise<string | undefined> {
     try {
       const partner = await this.userQueryService.userInfoById(partnerId);
       return partner?.nickname;

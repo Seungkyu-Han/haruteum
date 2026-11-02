@@ -16,6 +16,7 @@ import { CoupleCodeExpiredException } from '../../couple-core/exceptions/couple-
 import { CoupleCodeAlreadyUsedException } from '../../couple-core/exceptions/couple-code-already-used.exception';
 import { CannotCoupleWithSelfException } from '../../couple-core/exceptions/cannot-couple-with-self.exception';
 import { CoupleNotFoundException } from '../../couple-core/exceptions/couple-not-found.exception';
+import { CoupleCodeGenerationFailedException } from '../../couple-core/exceptions/couple-code-generation-failed.exception';
 
 @Injectable()
 export class CoupleCommandServiceImpl implements ICoupleCommandService {
@@ -59,7 +60,7 @@ export class CoupleCommandServiceImpl implements ICoupleCommandService {
     }
 
     if (!code) {
-      throw new Error('초대 코드 생성에 실패했습니다. 다시 시도해주세요.');
+      throw new CoupleCodeGenerationFailedException();
     }
 
     const expiresAt = new Date();
@@ -82,7 +83,9 @@ export class CoupleCommandServiceImpl implements ICoupleCommandService {
     // 1. 받는 유저가 이미 커플인지 확인
     const userCouple = await this.coupleRepository.findByUserId(userId);
     if (userCouple) {
-      throw new AlreadyInCoupleException('이미 커플로 연결되어 있는 사용자입니다.');
+      throw new AlreadyInCoupleException(
+        '이미 커플로 연결되어 있는 사용자입니다.',
+      );
     }
 
     // 2. 초대 코드 조회

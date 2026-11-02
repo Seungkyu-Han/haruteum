@@ -10,9 +10,7 @@ import {
 } from '../mappers/couple-invite-code.mapper';
 
 @Injectable()
-export class CoupleInviteCodeRepositoryPg
-  implements ICoupleInviteCodeRepository
-{
+export class CoupleInviteCodeRepositoryPg implements ICoupleInviteCodeRepository {
   constructor(
     @InjectRepository(CoupleInviteCodeEntity)
     private readonly inviteCodeRepository: Repository<CoupleInviteCodeEntity>,
