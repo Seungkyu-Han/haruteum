@@ -7,6 +7,8 @@ export interface ICalendarQueryService {
     endDate: Date,
   ): Promise<CalendarSchedule[]>;
 
-  getScheduleById(userId: string, scheduleId: string): Promise<CalendarSchedule>;
+  getScheduleById(
+    userId: string,
+    scheduleId: string,
+  ): Promise<CalendarSchedule>;
 }
-

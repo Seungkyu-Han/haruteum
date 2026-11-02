@@ -51,4 +51,3 @@ export class UpdateCalendarScheduleRequestDto {
   @IsBoolean({ message: '완료 여부는 불리언 값이어야 합니다.' })
   isCompleted?: boolean;
 }
-

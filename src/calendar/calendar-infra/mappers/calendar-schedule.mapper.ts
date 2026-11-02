@@ -36,4 +36,3 @@ export function calendarScheduleToEntity(
   entity.deletedAt = domain.deletedAt;
   return entity;
 }
-

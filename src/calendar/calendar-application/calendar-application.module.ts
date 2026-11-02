@@ -23,4 +23,3 @@ import { CalendarQueryServiceImpl } from './services/calendar-query.service.impl
   exports: [CALENDAR_COMMAND_SERVICE, CALENDAR_QUERY_SERVICE],
 })
 export class CalendarApplicationModule {}
-

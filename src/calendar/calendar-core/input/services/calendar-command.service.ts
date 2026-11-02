@@ -21,4 +21,3 @@ export interface ICalendarCommandService {
 
   deleteSchedule(userId: string, scheduleId: string): Promise<void>;
 }
-

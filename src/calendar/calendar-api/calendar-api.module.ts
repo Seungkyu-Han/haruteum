@@ -15,4 +15,3 @@ import { CalendarV1Controller } from './controllers/calendar.v1.controller';
   controllers: [CalendarV1Controller],
 })
 export class CalendarApiModule {}
-

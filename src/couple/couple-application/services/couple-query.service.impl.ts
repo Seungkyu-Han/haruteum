@@ -45,7 +45,9 @@ export class CoupleQueryServiceImpl implements ICoupleQueryService {
     // 1. 요청한 유저가 이미 커플인지 확인
     const userCouple = await this.coupleRepository.findByUserId(userId);
     if (userCouple) {
-      throw new AlreadyInCoupleException('이미 커플로 연결되어 있는 사용자입니다.');
+      throw new AlreadyInCoupleException(
+        '이미 커플로 연결되어 있는 사용자입니다.',
+      );
     }
 
     // 2. 초대 코드 조회
@@ -73,7 +75,9 @@ export class CoupleQueryServiceImpl implements ICoupleQueryService {
       inviteCode.inviterId,
     );
     if (inviterCouple) {
-      throw new AlreadyInCoupleException('초대한 사용자가 이미 커플 상태입니다.');
+      throw new AlreadyInCoupleException(
+        '초대한 사용자가 이미 커플 상태입니다.',
+      );
     }
 
     return inviteCode;

@@ -135,4 +135,3 @@ export class CalendarSchedule {
     return this._coupleId === coupleId;
   }
 }
-

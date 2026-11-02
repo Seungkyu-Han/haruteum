@@ -113,8 +113,8 @@ export class MemoryCommandServiceImpl implements MemoryCommandService {
 
     const normalizedMode = createMemoryCommand.mode?.trim().toUpperCase();
     if (
-      normalizedMode !== MemoryMode.TOGETHER &&
-      normalizedMode !== MemoryMode.SOLO
+      normalizedMode !== (MemoryMode.TOGETHER as string) &&
+      normalizedMode !== (MemoryMode.SOLO as string)
     ) {
       throw new InvalidMemoryModeException();
     }

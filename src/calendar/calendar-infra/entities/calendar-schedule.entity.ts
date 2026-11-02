@@ -50,4 +50,3 @@ export class CalendarScheduleEntity {
   @DeleteDateColumn({ type: 'timestamp', nullable: true })
   deletedAt?: Date;
 }
-

@@ -71,7 +71,8 @@ export class MemoryController {
   @ApiProduces('application/json')
   @ApiOperation({
     summary: '추억 목록 조회',
-    description: '로그인한 사용자의 추억 목록을 페이징 및 기간 필터로 조회합니다.',
+    description:
+      '로그인한 사용자의 추억 목록을 페이징 및 기간 필터로 조회합니다.',
   })
   @ApiResponse({
     status: HttpStatus.OK,
@@ -80,7 +81,8 @@ export class MemoryController {
   })
   @ApiResponse({
     status: HttpStatus.BAD_REQUEST,
-    description: '시작일과 종료일은 동시에 지정되어야 하며 시작일은 종료일 이전이어야 합니다.',
+    description:
+      '시작일과 종료일은 동시에 지정되어야 하며 시작일은 종료일 이전이어야 합니다.',
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,

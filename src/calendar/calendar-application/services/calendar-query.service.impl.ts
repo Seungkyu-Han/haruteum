@@ -57,4 +57,3 @@ export class CalendarQueryServiceImpl implements ICalendarQueryService {
     return schedule;
   }
 }
-

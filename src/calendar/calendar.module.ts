@@ -5,4 +5,3 @@ import { CalendarApiModule } from './calendar-api/calendar-api.module';
   imports: [CalendarApiModule],
 })
 export class CalendarModule {}
-

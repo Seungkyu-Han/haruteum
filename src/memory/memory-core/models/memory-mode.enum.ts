@@ -7,9 +7,8 @@ export function isCoupleMemoryMode(mode?: string): boolean {
   if (!mode) return false;
   const normalized = mode.trim().toUpperCase();
   return (
-    normalized === MemoryMode.TOGETHER ||
+    normalized === (MemoryMode.TOGETHER as string) ||
     normalized === 'COUPLE' ||
     normalized === 'SHARED'
   );
 }
-

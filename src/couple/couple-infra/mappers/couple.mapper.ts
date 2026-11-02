@@ -18,5 +18,5 @@ export function coupleToEntity(domain: Couple): CoupleEntity {
     user2Id: domain.user2Id,
     createdAt: domain.createdAt,
     deletedAt: domain.deletedAt,
-  } as CoupleEntity;
+  };
 }

@@ -10,9 +10,7 @@ import {
 } from '../mappers/calendar-schedule.mapper';
 
 @Injectable()
-export class CalendarScheduleRepositoryPg
-  implements ICalendarScheduleRepository
-{
+export class CalendarScheduleRepositoryPg implements ICalendarScheduleRepository {
   constructor(
     @InjectRepository(CalendarScheduleEntity)
     private readonly repository: Repository<CalendarScheduleEntity>,
@@ -52,4 +50,3 @@ export class CalendarScheduleRepositoryPg
     await this.repository.softDelete(id);
   }
 }
-

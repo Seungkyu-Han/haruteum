@@ -5,4 +5,3 @@ export interface UpdateCalendarScheduleCommand {
   endDate?: Date;
   isCompleted?: boolean;
 }
-

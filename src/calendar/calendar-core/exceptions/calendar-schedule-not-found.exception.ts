@@ -3,4 +3,3 @@ export class CalendarScheduleNotFoundException extends Error {
     super(message);
   }
 }
-
