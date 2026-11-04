@@ -5,8 +5,10 @@ import {
   Get,
   HttpStatus,
   Inject,
+  MessageEvent,
   Post,
   Query,
+  Sse,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -21,18 +23,22 @@ import {
   Principal,
 } from '@seungkyu/guardian';
 import { MapError } from '@seungkyu/error-mapper';
+import { Observable } from 'rxjs';
 import {
   COUPLE_COMMAND_SERVICE,
   COUPLE_QUERY_SERVICE,
+  COUPLE_SSE_SERVICE,
 } from '../../couple-core/couple.token';
 import type { ICoupleCommandService } from '../../couple-core/input/services/couple-command.service';
 import type { ICoupleQueryService } from '../../couple-core/input/services/couple-query.service';
+import type { ICoupleSseService } from '../../couple-core/input/services/couple-sse.service';
 import { USER_QUERY_SERVICE } from '../../../user/user-core/user.token';
 import type { IUserQueryService } from '../../../user/user-core/input/services/user-query.service';
 import { ConnectCoupleRequestDto } from '../dto/request/connect-couple.request.dto';
 import { CheckInviteCodeRequestDto } from '../dto/request/check-invite-code.request.dto';
 import { InviteCodeResponseDto } from '../dto/response/invite-code.response.dto';
 import { CoupleInfoResponseDto } from '../dto/response/couple-info.response.dto';
+import { CoupleConnectedEventResponseDto } from '../dto/response/couple-connected-event.response.dto';
 import { AlreadyInCoupleException } from '../../couple-core/exceptions/already-in-couple.exception';
 import { InvalidCoupleCodeException } from '../../couple-core/exceptions/invalid-couple-code.exception';
 import { CoupleCodeExpiredException } from '../../couple-core/exceptions/couple-code-expired.exception';
@@ -51,6 +57,8 @@ export class CoupleV1Controller {
     private readonly coupleCommandService: ICoupleCommandService,
     @Inject(COUPLE_QUERY_SERVICE)
     private readonly coupleQueryService: ICoupleQueryService,
+    @Inject(COUPLE_SSE_SERVICE)
+    private readonly coupleSseService: ICoupleSseService,
     @Inject(USER_QUERY_SERVICE)
     private readonly userQueryService: IUserQueryService,
   ) {}
@@ -220,6 +228,48 @@ export class CoupleV1Controller {
       partnerNickname,
       createdAt: couple.createdAt,
     };
+  }
+
+  @Sse('/connect/sse')
+  @ApiOperation({
+    summary: '커플 연결 실시간 SSE 스트림',
+    description:
+      '초대 코드를 생성한 사용자가 상대방의 연결 완료 이벤트를 실시간으로 수신하기 위한 SSE 스트림입니다.\n\n' +
+      '- 인증: Authorization Bearer 헤더 또는 ?token=... 쿼리 파라미터 지원\n' +
+      '- 발생 이벤트:\n' +
+      '  - `connected`: SSE 연결 성공 확인\n' +
+      '  - `ping`: 30초 주기 연결 유지 하트비트\n' +
+      '  - `couple_connected`: 커플 연결 성사 완료 알림 (상대방 ID 및 닉네임 포함)',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'SSE 스트림 연결 성공 (text/event-stream)',
+    type: CoupleConnectedEventResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: '인증되지 않은 사용자입니다.',
+  })
+  connectSse(@Authentication() principal: Principal): Observable<MessageEvent> {
+    return this.coupleSseService.subscribe(principal.id);
+  }
+
+  @Sse('/sse')
+  @ApiOperation({
+    summary: '커플 연결 실시간 SSE 스트림 (별칭)',
+    description: '/couple/connect/sse와 동일한 기능을 수행합니다.',
+  })
+  @ApiResponse({
+    status: HttpStatus.OK,
+    description: 'SSE 스트림 연결 성공 (text/event-stream)',
+    type: CoupleConnectedEventResponseDto,
+  })
+  @ApiResponse({
+    status: HttpStatus.UNAUTHORIZED,
+    description: '인증되지 않은 사용자입니다.',
+  })
+  sse(@Authentication() principal: Principal): Observable<MessageEvent> {
+    return this.coupleSseService.subscribe(principal.id);
   }
 
   @Get('/me')

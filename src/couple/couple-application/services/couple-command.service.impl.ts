@@ -1,13 +1,17 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, Logger } from '@nestjs/common';
 import { ICoupleCommandService } from '../../couple-core/input/services/couple-command.service';
 import {
   COUPLE_CODE_GENERATOR,
   COUPLE_INVITE_CODE_REPOSITORY,
   COUPLE_REPOSITORY,
+  COUPLE_SSE_SERVICE,
 } from '../../couple-core/couple.token';
 import type { ICoupleRepository } from '../../couple-core/output/repositories/couple.repository';
 import type { ICoupleInviteCodeRepository } from '../../couple-core/output/repositories/couple-invite-code.repository';
 import type { ICoupleCodeGenerator } from '../../couple-core/output/generators/couple-code.generator';
+import type { ICoupleSseService } from '../../couple-core/input/services/couple-sse.service';
+import { USER_QUERY_SERVICE } from '../../../user/user-core/user.token';
+import type { IUserQueryService } from '../../../user/user-core/input/services/user-query.service';
 import { CoupleInviteCode } from '../../couple-core/couple-invite-code';
 import { Couple } from '../../couple-core/couple';
 import { AlreadyInCoupleException } from '../../couple-core/exceptions/already-in-couple.exception';
@@ -21,6 +25,7 @@ import { CoupleCodeGenerationFailedException } from '../../couple-core/exception
 @Injectable()
 export class CoupleCommandServiceImpl implements ICoupleCommandService {
   private static readonly CODE_EXPIRATION_HOURS = 24;
+  private readonly logger = new Logger(CoupleCommandServiceImpl.name);
 
   constructor(
     @Inject(COUPLE_REPOSITORY)
@@ -29,6 +34,10 @@ export class CoupleCommandServiceImpl implements ICoupleCommandService {
     private readonly coupleInviteCodeRepository: ICoupleInviteCodeRepository,
     @Inject(COUPLE_CODE_GENERATOR)
     private readonly coupleCodeGenerator: ICoupleCodeGenerator,
+    @Inject(COUPLE_SSE_SERVICE)
+    private readonly coupleSseService: ICoupleSseService,
+    @Inject(USER_QUERY_SERVICE)
+    private readonly userQueryService: IUserQueryService,
   ) {}
 
   async generateInviteCode(userId: string): Promise<CoupleInviteCode> {
@@ -136,6 +145,26 @@ export class CoupleCommandServiceImpl implements ICoupleCommandService {
       inviteCode.inviterId,
     );
     await this.coupleInviteCodeRepository.invalidateByInviterId(userId);
+
+    // 8. SSE 이벤트 발행: 초대한 사람(inviterId)에게 커플 연결 완료 알림
+    try {
+      let partnerNickname: string | undefined;
+      try {
+        const partner = await this.userQueryService.userInfoById(userId);
+        partnerNickname = partner?.nickname;
+      } catch {
+        partnerNickname = undefined;
+      }
+
+      this.coupleSseService.emitCoupleConnected(inviteCode.inviterId, {
+        coupleId: couple.id,
+        partnerId: userId,
+        partnerNickname,
+        createdAt: couple.createdAt,
+      });
+    } catch (e) {
+      this.logger.error('Failed to emit couple_connected SSE event', e);
+    }
 
     return couple;
   }
