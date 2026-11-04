@@ -254,24 +254,6 @@ export class CoupleV1Controller {
     return this.coupleSseService.subscribe(principal.id);
   }
 
-  @Sse('/sse')
-  @ApiOperation({
-    summary: '커플 연결 실시간 SSE 스트림 (별칭)',
-    description: '/couple/connect/sse와 동일한 기능을 수행합니다.',
-  })
-  @ApiResponse({
-    status: HttpStatus.OK,
-    description: 'SSE 스트림 연결 성공 (text/event-stream)',
-    type: CoupleConnectedEventResponseDto,
-  })
-  @ApiResponse({
-    status: HttpStatus.UNAUTHORIZED,
-    description: '인증되지 않은 사용자입니다.',
-  })
-  sse(@Authentication() principal: Principal): Observable<MessageEvent> {
-    return this.coupleSseService.subscribe(principal.id);
-  }
-
   @Get('/me')
   @ApiOperation({
     summary: '현재 로그인한 사용자의 커플 정보를 조회합니다.',
