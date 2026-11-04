@@ -5,9 +5,11 @@ import { initVersioning } from './config/versioning.config';
 import { initCorsConfig } from './config/cors.config';
 import { initErrorMapper } from './config/error-mapper.config';
 import { initValidationPipe } from './config/validation-pipe.config';
+import { initTokenQuery } from './config/token-query.config';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  initTokenQuery(app);
   initSwagger(app);
   initVersioning(app);
   initCorsConfig(app);
