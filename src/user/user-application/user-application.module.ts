@@ -12,17 +12,14 @@ import { JwtModule } from '@nestjs/jwt';
 import { GuardianModule } from '@seungkyu/guardian';
 import { UserQueryServiceImpl } from './services/user-query.service.impl';
 import { UserCommandServiceImpl } from './services/user-command.service.impl';
+import { getGuardianOptions } from '../../config/guardian.config';
 
 @Module({
   imports: [
     HttpModule,
     UserInfraModule,
     JwtModule,
-    GuardianModule.forRoot({
-      accessTokenOptions: {
-        secretKey: process.env.JWT_SECRET ?? '',
-      },
-    }),
+    GuardianModule.forRoot(getGuardianOptions()),
   ],
   providers: [
     {

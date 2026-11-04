@@ -6,14 +6,11 @@ import {
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ErrorReporterModule } from '@seungkyu/error-reporter';
 import { GuardianModule } from '@seungkyu/guardian';
+import { getGuardianOptions } from './guardian.config';
 
 @Module({
   imports: [
-    GuardianModule.forRoot({
-      accessTokenOptions: {
-        secretKey: process.env.JWT_SECRET ?? '',
-      },
-    }),
+    GuardianModule.forRoot(getGuardianOptions()),
     NestConfigModule.forRoot({
       isGlobal: false,
     }),
