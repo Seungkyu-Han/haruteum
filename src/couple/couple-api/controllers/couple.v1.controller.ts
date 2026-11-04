@@ -39,6 +39,7 @@ import { CheckInviteCodeRequestDto } from '../dto/request/check-invite-code.requ
 import { InviteCodeResponseDto } from '../dto/response/invite-code.response.dto';
 import { CoupleInfoResponseDto } from '../dto/response/couple-info.response.dto';
 import { CoupleConnectedEventResponseDto } from '../dto/response/couple-connected-event.response.dto';
+import { CoupleConnectStatusResponseDto } from '../dto/response/couple-connect-status.response.dto';
 import { AlreadyInCoupleException } from '../../couple-core/exceptions/already-in-couple.exception';
 import { InvalidCoupleCodeException } from '../../couple-core/exceptions/invalid-couple-code.exception';
 import { CoupleCodeExpiredException } from '../../couple-core/exceptions/couple-code-expired.exception';
@@ -254,22 +255,42 @@ export class CoupleV1Controller {
     return this.coupleSseService.subscribe(principal.id);
   }
 
-  @Sse('/sse')
+  @Get('/connect/status')
   @ApiOperation({
-    summary: '커플 연결 실시간 SSE 스트림 (별칭)',
-    description: '/couple/connect/sse와 동일한 기능을 수행합니다.',
+    summary: '커플 연결 여부 조회 (폴링용)',
+    description:
+      '초대 코드를 생성한 사용자가 상대방의 연결 여부를 주기적으로 확인할 때 사용하는 폴링 API입니다. 연결되지 않은 경우 isConnected: false를 반환합니다.',
   })
   @ApiResponse({
     status: HttpStatus.OK,
-    description: 'SSE 스트림 연결 성공 (text/event-stream)',
-    type: CoupleConnectedEventResponseDto,
+    description: '커플 연결 상태 조회 성공',
+    type: CoupleConnectStatusResponseDto,
   })
   @ApiResponse({
     status: HttpStatus.UNAUTHORIZED,
     description: '인증되지 않은 사용자입니다.',
   })
-  sse(@Authentication() principal: Principal): Observable<MessageEvent> {
-    return this.coupleSseService.subscribe(principal.id);
+  async getConnectStatus(
+    @Authentication() principal: Principal,
+  ): Promise<CoupleConnectStatusResponseDto> {
+    const couple = await this.coupleQueryService.findCoupleByUserId(
+      principal.id,
+    );
+
+    if (!couple) {
+      return { isConnected: false };
+    }
+
+    const partnerId = couple.getPartnerId(principal.id);
+    const partnerNickname = await this.fetchPartnerNickname(partnerId);
+
+    return {
+      isConnected: true,
+      coupleId: couple.id,
+      partnerId,
+      partnerNickname,
+      createdAt: couple.createdAt,
+    };
   }
 
   @Get('/me')

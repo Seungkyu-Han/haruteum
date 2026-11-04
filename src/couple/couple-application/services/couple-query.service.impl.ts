@@ -32,6 +32,10 @@ export class CoupleQueryServiceImpl implements ICoupleQueryService {
     return couple;
   }
 
+  async findCoupleByUserId(userId: string): Promise<Couple | null> {
+    return await this.coupleRepository.findByUserId(userId);
+  }
+
   async getValidInviteCode(userId: string): Promise<CoupleInviteCode | null> {
     return await this.coupleInviteCodeRepository.findActiveByInviterId(userId);
   }
